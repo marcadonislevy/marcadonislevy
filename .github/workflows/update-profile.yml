@@ -75,13 +75,11 @@ jobs:
 
       - name: Verify generated public profile
         shell: bash
-        env:
-          PROFILE_DENYLIST: ${{ secrets.PROFILE_DENYLIST }}
         run: |
           set -euo pipefail
           node --input-type=module <<'NODE'
           const { verifyPublicOutput } = await import("./.profile-runtime/scripts/verify-public-output.mjs");
-          const result = await verifyPublicOutput(process.cwd(), process.env.PROFILE_DENYLIST);
+          const result = await verifyPublicOutput(process.cwd());
           console.log(`Verified ${result.files} public profile files.`);
           NODE
           git diff --check
