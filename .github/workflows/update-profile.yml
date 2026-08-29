@@ -6,6 +6,7 @@ on:
       - main
     paths:
       - ".github/workflows/update-profile.yml"
+      - "source/profile-source.b64.*"
   schedule:
     - cron: "23 4 * * *"
   workflow_dispatch:
