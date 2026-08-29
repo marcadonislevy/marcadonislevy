@@ -1,0 +1,82 @@
+name: Refresh profile activity
+
+on:
+  schedule:
+    - cron: "23 4 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: profile-activity
+  cancel-in-progress: false
+
+jobs:
+  refresh:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+
+    steps:
+      - name: Check out profile repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 1
+          persist-credentials: true
+
+      - name: Set up Node.js
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: "24.18.1"
+          package-manager-cache: false
+
+      - name: Validate required inputs
+        shell: bash
+        env:
+          PROFILE_STATS_TOKEN: ${{ secrets.PROFILE_STATS_TOKEN }}
+          PROFILE_OWNER_LOGINS: ${{ secrets.PROFILE_OWNER_LOGINS }}
+        run: |
+          set -euo pipefail
+          test -n "${PROFILE_STATS_TOKEN}" || { echo "::error::PROFILE_STATS_TOKEN is not configured."; exit 1; }
+          test -n "${PROFILE_OWNER_LOGINS}" || { echo "::error::PROFILE_OWNER_LOGINS is not configured."; exit 1; }
+
+      - name: Run profile tests
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm test
+
+      - name: Generate profile from GitHub data
+        shell: bash
+        env:
+          PROFILE_LOGIN: ${{ github.repository_owner }}
+          PROFILE_STATS_TOKEN: ${{ secrets.PROFILE_STATS_TOKEN }}
+          PROFILE_OWNER_LOGINS: ${{ secrets.PROFILE_OWNER_LOGINS }}
+        run: |
+          set -euo pipefail
+          node scripts/generate-profile.mjs
+
+      - name: Verify generated public profile
+        shell: bash
+        env:
+          PROFILE_DENYLIST: ${{ secrets.PROFILE_DENYLIST }}
+        run: |
+          set -euo pipefail
+          node scripts/verify-public-output.mjs
+          git diff --check
+
+      - name: Commit refreshed profile
+        shell: bash
+        env:
+          BRANCH_NAME: ${{ github.ref_name }}
+        run: |
+          set -euo pipefail
+          git add README.md assets/profile-light.svg assets/profile-dark.svg assets/stats.json
+          if git diff --cached --quiet; then
+            echo "No profile changes to commit."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -m "chore(profile): refresh GitHub activity"
+          git push origin "HEAD:${BRANCH_NAME}"
