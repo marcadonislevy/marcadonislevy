@@ -1,31 +1,13 @@
 <div align="center">
-  <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="./assets/profile-hero-dark.svg">
-    <source media="(prefers-color-scheme: light)" srcset="./assets/profile-hero-light.svg">
-    <img src="./assets/profile-hero-light.svg" width="100%" alt="Marc Levy — technology portfolio">
-  </picture>
-</div>
+  <img src="./assets/profile-hero-light.svg#gh-light-mode-only" width="100%" alt="Marc Levy — technology portfolio introduction">
+  <img src="./assets/profile-hero-dark.svg#gh-dark-mode-only" width="100%" alt="Marc Levy — technology portfolio introduction">
 
-<div align="center">
-  <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="./assets/profile-technology-dark.svg">
-    <source media="(prefers-color-scheme: light)" srcset="./assets/profile-technology-light.svg">
-    <img src="./assets/profile-technology-light.svg" width="100%" alt="Marc Levy — technology ecosystem">
-  </picture>
-</div>
+  <img src="./assets/profile-technology-light.svg#gh-light-mode-only" width="100%" alt="Technology ecosystem">
+  <img src="./assets/profile-technology-dark.svg#gh-dark-mode-only" width="100%" alt="Technology ecosystem">
 
-<div align="center">
-  <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="./assets/profile-activity-dark.svg">
-    <source media="(prefers-color-scheme: light)" srcset="./assets/profile-activity-light.svg">
-    <img src="./assets/profile-activity-light.svg" width="100%" alt="Marc Levy — GitHub activity">
-  </picture>
-</div>
+  <img src="./assets/profile-activity-light.svg#gh-light-mode-only" width="100%" alt="GitHub activity and contribution calendar">
+  <img src="./assets/profile-activity-dark.svg#gh-dark-mode-only" width="100%" alt="GitHub activity and contribution calendar">
 
-<div align="center">
-  <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="./assets/profile-focus-dark.svg">
-    <source media="(prefers-color-scheme: light)" srcset="./assets/profile-focus-light.svg">
-    <img src="./assets/profile-focus-light.svg" width="100%" alt="Marc Levy — focus areas">
-  </picture>
+  <img src="./assets/profile-focus-light.svg#gh-light-mode-only" width="100%" alt="What I build">
+  <img src="./assets/profile-focus-dark.svg#gh-dark-mode-only" width="100%" alt="What I build">
 </div>
