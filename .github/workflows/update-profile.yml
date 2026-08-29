@@ -19,7 +19,7 @@ concurrency:
   cancel-in-progress: false
 
 env:
-  PROFILE_SOURCE_SHA256: cc3e3b1cc19cc73a0e2c04ea5c47d982208333a91e1f782c51fd58c5c500abf0
+  PROFILE_SOURCE_SHA256: c3d70d263dbc02d7641d6d8366df5b9937ee08bd093a78b188feeef3d98a531a
 
 jobs:
   refresh:
