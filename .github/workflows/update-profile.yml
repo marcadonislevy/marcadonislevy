@@ -1,6 +1,12 @@
 name: Refresh profile activity
 
 on:
+  push:
+    branches:
+      - main
+    paths:
+      - ".github/workflows/update-profile.yml"
+      - "source/profile-source.b64.*"
   schedule:
     - cron: "23 4 * * *"
   workflow_dispatch:
@@ -13,7 +19,7 @@ concurrency:
   cancel-in-progress: false
 
 env:
-  PROFILE_SOURCE_SHA256: fd7c96fad42fd2288de19d86bf7c8708a8065312dcd9758461d75c8f640e9d39
+  PROFILE_SOURCE_SHA256: cc3e3b1cc19cc73a0e2c04ea5c47d982208333a91e1f782c51fd58c5c500abf0
 
 jobs:
   refresh:
@@ -90,7 +96,7 @@ jobs:
           BRANCH_NAME: ${{ github.ref_name }}
         run: |
           set -euo pipefail
-          git add README.md assets/profile-light.svg assets/profile-dark.svg assets/stats.json
+          git add -A -- README.md assets
           if git diff --cached --quiet; then
             echo "No profile changes to commit."
             exit 0
