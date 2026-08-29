@@ -1,0 +1,88 @@
+name: Apply profile theme selection
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - ".github/workflows/apply-profile-theme.yml"
+  workflow_run:
+    workflows:
+      - "Refresh profile activity"
+    types:
+      - completed
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: profile-theme-selection
+  cancel-in-progress: false
+
+jobs:
+  apply:
+    if: github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+
+    steps:
+      - name: Check out current main branch
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: main
+          fetch-depth: 1
+          persist-credentials: true
+
+      - name: Verify generated profile sections exist
+        shell: bash
+        run: |
+          set -euo pipefail
+          for section in hero technology activity focus; do
+            test -s "assets/profile-${section}-light.svg"
+            test -s "assets/profile-${section}-dark.svg"
+          done
+
+      - name: Apply GitHub theme-aware README
+        shell: bash
+        run: |
+          set -euo pipefail
+          cat > README.md <<'EOF'
+          <div align="center">
+            <img src="./assets/profile-hero-light.svg#gh-light-mode-only" width="100%" alt="Marc Levy — technology portfolio introduction">
+            <img src="./assets/profile-hero-dark.svg#gh-dark-mode-only" width="100%" alt="Marc Levy — technology portfolio introduction">
+
+            <img src="./assets/profile-technology-light.svg#gh-light-mode-only" width="100%" alt="Technology ecosystem">
+            <img src="./assets/profile-technology-dark.svg#gh-dark-mode-only" width="100%" alt="Technology ecosystem">
+
+            <img src="./assets/profile-activity-light.svg#gh-light-mode-only" width="100%" alt="GitHub activity and contribution calendar">
+            <img src="./assets/profile-activity-dark.svg#gh-dark-mode-only" width="100%" alt="GitHub activity and contribution calendar">
+
+            <img src="./assets/profile-focus-light.svg#gh-light-mode-only" width="100%" alt="What I build">
+            <img src="./assets/profile-focus-dark.svg#gh-dark-mode-only" width="100%" alt="What I build">
+          </div>
+          EOF
+
+      - name: Verify theme selection markup
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(grep -o '#gh-light-mode-only' README.md | wc -l | tr -d ' ')" = "4"
+          test "$(grep -o '#gh-dark-mode-only' README.md | wc -l | tr -d ' ')" = "4"
+          git diff --check
+
+      - name: Commit theme-aware README
+        shell: bash
+        env:
+          BRANCH_NAME: main
+        run: |
+          set -euo pipefail
+          git add README.md
+          if git diff --cached --quiet; then
+            echo "Theme-aware README is already current."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -m "fix(profile): follow selected GitHub colour mode"
+          git push origin "HEAD:${BRANCH_NAME}"
