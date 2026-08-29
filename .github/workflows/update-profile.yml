@@ -12,6 +12,9 @@ concurrency:
   group: profile-activity
   cancel-in-progress: false
 
+env:
+  PROFILE_SOURCE_SHA256: 771e1041017c280645c73d2b71b42a714fa96a088cd41e0a8238a87cc3691c64
+
 jobs:
   refresh:
     runs-on: ubuntu-24.04
@@ -40,11 +43,25 @@ jobs:
           test -n "${PROFILE_STATS_TOKEN}" || { echo "::error::PROFILE_STATS_TOKEN is not configured."; exit 1; }
           test -n "${PROFILE_OWNER_LOGINS}" || { echo "::error::PROFILE_OWNER_LOGINS is not configured."; exit 1; }
 
+      - name: Restore validated generator source
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm -rf .profile-runtime .profile-runtime.zip
+          cat source/profile-source.b64.* | base64 --decode > .profile-runtime.zip
+          actual_sha256="$(sha256sum .profile-runtime.zip | cut -d' ' -f1)"
+          if [[ "${actual_sha256}" != "${PROFILE_SOURCE_SHA256}" ]]; then
+            echo "::error::Profile generator source failed its integrity check."
+            exit 1
+          fi
+          mkdir .profile-runtime
+          unzip -q .profile-runtime.zip -d .profile-runtime
+
       - name: Run profile tests
         shell: bash
         run: |
           set -euo pipefail
-          npm test
+          npm --prefix .profile-runtime test
 
       - name: Generate profile from GitHub data
         shell: bash
@@ -54,7 +71,7 @@ jobs:
           PROFILE_OWNER_LOGINS: ${{ secrets.PROFILE_OWNER_LOGINS }}
         run: |
           set -euo pipefail
-          node scripts/generate-profile.mjs
+          node .profile-runtime/scripts/generate-profile.mjs --output "${GITHUB_WORKSPACE}"
 
       - name: Verify generated public profile
         shell: bash
@@ -62,7 +79,11 @@ jobs:
           PROFILE_DENYLIST: ${{ secrets.PROFILE_DENYLIST }}
         run: |
           set -euo pipefail
-          node scripts/verify-public-output.mjs
+          node --input-type=module <<'NODE'
+          const { verifyPublicOutput } = await import("./.profile-runtime/scripts/verify-public-output.mjs");
+          const result = await verifyPublicOutput(process.cwd(), process.env.PROFILE_DENYLIST);
+          console.log(`Verified ${result.files} public profile files.`);
+          NODE
           git diff --check
 
       - name: Commit refreshed profile
