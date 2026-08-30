@@ -7,8 +7,11 @@ on:
     paths:
       - ".github/workflows/update-profile.yml"
       - "source/profile-source.b64.*"
+      - "scripts/update-repository-issue-metrics.mjs"
+      - "test/repository-issue-metrics.test.mjs"
   schedule:
-    - cron: "23 4 * * *"
+    # Refresh automatically every hour, away from the top-of-hour peak.
+    - cron: "17 * * * *"
   workflow_dispatch:
 
 permissions:
@@ -74,6 +77,7 @@ jobs:
         run: |
           set -euo pipefail
           npm --prefix .profile-runtime test
+          node --test test/repository-issue-metrics.test.mjs
 
       - name: Generate profile from GitHub data
         shell: bash
@@ -85,14 +89,42 @@ jobs:
           set -euo pipefail
           node .profile-runtime/scripts/generate-profile.mjs --output "${GITHUB_WORKSPACE}"
 
+      - name: Aggregate issues across selected repositories
+        shell: bash
+        env:
+          PROFILE_STATS_TOKEN: ${{ secrets.PROFILE_STATS_TOKEN }}
+          PROFILE_OWNER_LOGINS: ${{ secrets.PROFILE_OWNER_LOGINS }}
+        run: |
+          set -euo pipefail
+          node scripts/update-repository-issue-metrics.mjs
+
       - name: Verify generated public profile
         shell: bash
         run: |
           set -euo pipefail
           node --input-type=module <<'NODE'
+          const { readFile } = await import("node:fs/promises");
           const { verifyPublicOutput } = await import("./.profile-runtime/scripts/verify-public-output.mjs");
           const result = await verifyPublicOutput(process.cwd());
           console.log(`Verified ${result.files} public profile files.`);
+
+          const stats = JSON.parse(await readFile("assets/stats.json", "utf8"));
+          if (stats.issues.authored !== stats.issues.open + stats.issues.closed) {
+            throw new Error("Repository issue totals are internally inconsistent.");
+          }
+          for (const filename of ["assets/profile-light.svg", "assets/profile-dark.svg"]) {
+            const svg = await readFile(filename, "utf8");
+            const expected = [
+              stats.issues.authored.toLocaleString("en-US"),
+              `${stats.issues.open.toLocaleString("en-US")} open`,
+              `${stats.issues.closed.toLocaleString("en-US")} closed`,
+            ];
+            for (const value of expected) {
+              if (!svg.includes(`>${value}</text>`)) {
+                throw new Error(`${filename} does not contain the repository issue value ${value}.`);
+              }
+            }
+          }
           NODE
           grep -q '.card-label { font-size: 24px;' assets/profile-light.svg
           grep -q '.card-label { font-size: 24px;' assets/profile-dark.svg
