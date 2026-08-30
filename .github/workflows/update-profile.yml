@@ -6,7 +6,6 @@ on:
       - main
     paths:
       - ".github/workflows/update-profile.yml"
-      - "source/profile-source.b64.*"
   schedule:
     - cron: "23 4 * * *"
   workflow_dispatch:
@@ -19,7 +18,7 @@ concurrency:
   cancel-in-progress: false
 
 env:
-  PROFILE_SOURCE_SHA256: 6c579dd118c095f4c3e3dc743cee6ae5ce55998f19fe1aca774aec6808f65cd0
+  PROFILE_SOURCE_SHA256: 771e1041017c280645c73d2b71b42a714fa96a088cd41e0a8238a87cc3691c64
 
 jobs:
   refresh:
@@ -53,30 +52,15 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          rm -rf .profile-runtime .profile-unpack .profile-runtime.zip
+          rm -rf .profile-runtime .profile-runtime.zip
           cat source/profile-source.b64.* | base64 --decode > .profile-runtime.zip
           actual_sha256="$(sha256sum .profile-runtime.zip | cut -d' ' -f1)"
           if [[ "${actual_sha256}" != "${PROFILE_SOURCE_SHA256}" ]]; then
             echo "::error::Profile generator source failed its integrity check."
             exit 1
           fi
-
-          mkdir .profile-unpack
-          unzip -q .profile-runtime.zip -d .profile-unpack
-          runtime_package="$(find .profile-unpack -mindepth 1 -maxdepth 3 -type f -name package.json -print -quit)"
-          test -n "${runtime_package}" || { echo "::error::Profile generator package.json was not found."; exit 1; }
-          runtime_root="$(dirname "${runtime_package}")"
-
-          if [[ "${runtime_root}" == ".profile-unpack" ]]; then
-            mv .profile-unpack .profile-runtime
-          else
-            mv "${runtime_root}" .profile-runtime
-            rm -rf .profile-unpack
-          fi
-
-          test -f .profile-runtime/package.json
-          test -f .profile-runtime/scripts/generate-profile.mjs
-          test -f .profile-runtime/scripts/verify-public-output.mjs
+          mkdir .profile-runtime
+          unzip -q .profile-runtime.zip -d .profile-runtime
 
       - name: Run profile tests
         shell: bash
@@ -111,12 +95,12 @@ jobs:
           BRANCH_NAME: ${{ github.ref_name }}
         run: |
           set -euo pipefail
-          git add -A -- README.md assets
+          git add README.md assets/profile-light.svg assets/profile-dark.svg assets/stats.json
           if git diff --cached --quiet; then
             echo "No profile changes to commit."
             exit 0
           fi
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git commit -m "chore(profile): publish native responsive README"
+          git commit -m "chore(profile): refresh GitHub activity"
           git push origin "HEAD:${BRANCH_NAME}"

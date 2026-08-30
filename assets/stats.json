@@ -1,12 +1,15 @@
 {
-  "schemaVersion": 2,
-  "generatedAt": "2026-08-30T00:43:02.023Z",
+  "schemaVersion": 1,
+  "generatedAt": "2026-08-29T20:30:13.343Z",
   "source": "github-api",
   "contributions": {
-    "total": 3806,
-    "lastYearTotal": 3804,
-    "commits": 2754,
+    "total": 3761,
+    "commits": 2709,
     "last365Days": [
+      {
+        "date": "2025-08-30",
+        "count": 0
+      },
       {
         "date": "2025-08-31",
         "count": 0
@@ -1461,11 +1464,7 @@
       },
       {
         "date": "2026-08-29",
-        "count": 59
-      },
-      {
-        "date": "2026-08-30",
-        "count": 22
+        "count": 36
       }
     ]
   },
