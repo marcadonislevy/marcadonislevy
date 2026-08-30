@@ -98,6 +98,42 @@ jobs:
           set -euo pipefail
           node scripts/update-repository-issue-metrics.mjs
 
+      - name: Suppress timestamp-only changes
+        shell: bash
+        run: |
+          set -euo pipefail
+          node --input-type=module <<'NODE'
+          const { execFileSync } = await import("node:child_process");
+          const { readFile, writeFile } = await import("node:fs/promises");
+
+          let previousText;
+          try {
+            previousText = execFileSync(
+              "git",
+              ["show", "HEAD:assets/stats.json"],
+              { encoding: "utf8" },
+            );
+          } catch {
+            console.log("No previous statistics snapshot is available for comparison.");
+            process.exit(0);
+          }
+
+          const previous = JSON.parse(previousText);
+          const currentPath = "assets/stats.json";
+          const current = JSON.parse(await readFile(currentPath, "utf8"));
+          const comparable = (value) => {
+            const clone = structuredClone(value);
+            delete clone.generatedAt;
+            return JSON.stringify(clone);
+          };
+
+          if (comparable(previous) === comparable(current)) {
+            current.generatedAt = previous.generatedAt;
+            await writeFile(currentPath, `${JSON.stringify(current, null, 2)}\n`, "utf8");
+            console.log("No metric values changed; retained the prior snapshot timestamp.");
+          }
+          NODE
+
       - name: Verify generated public profile
         shell: bash
         run: |
