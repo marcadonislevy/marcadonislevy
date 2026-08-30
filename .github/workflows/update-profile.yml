@@ -27,10 +27,13 @@ jobs:
     timeout-minutes: 20
 
     steps:
-      - name: Check out profile repository
+      - name: Check out current profile branch
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
-          fetch-depth: 1
+          # A re-run retains the original event SHA. Resolve the branch name
+          # explicitly so a later re-run starts from the current branch tip.
+          ref: ${{ github.ref_name }}
+          fetch-depth: 0
           persist-credentials: true
 
       - name: Set up Node.js
@@ -110,7 +113,28 @@ jobs:
             echo "No profile changes to commit."
             exit 0
           fi
+
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git commit -m "chore(profile): refresh approved visual profile"
-          git push origin "HEAD:${BRANCH_NAME}"
+
+          # A branch may still advance after checkout. Rebase and retry a
+          # bounded number of times; never force-push over newer work.
+          for attempt in 1 2 3; do
+            if git push origin "HEAD:${BRANCH_NAME}"; then
+              exit 0
+            fi
+
+            if [[ "${attempt}" -eq 3 ]]; then
+              echo "::error::Remote branch changed repeatedly; profile commit was not published."
+              exit 1
+            fi
+
+            echo "Remote branch advanced; rebasing profile commit (attempt ${attempt}/3)."
+            git fetch origin "${BRANCH_NAME}"
+            if ! git rebase "origin/${BRANCH_NAME}"; then
+              git rebase --abort || true
+              echo "::error::Generated profile conflicts with newer work on ${BRANCH_NAME}; refusing to overwrite it."
+              exit 1
+            fi
+          done
