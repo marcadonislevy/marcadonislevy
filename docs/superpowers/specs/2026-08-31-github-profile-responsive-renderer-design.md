@@ -1,6 +1,6 @@
 # GitHub Profile Responsive Renderer Design
 
-**Status:** Approved design, awaiting implementation plan  
+**Status:** Approved design, awaiting written-spec review  
 **Date:** 31 August 2026  
 **Branch:** `profile-responsive-layout-20260831`
 
@@ -49,13 +49,13 @@ The contribution calendar also uses custom label positioning and intensity thres
 
 ## 4. Chosen approach
 
-Generate three responsive layout geometries, each in light and dark variants:
+Generate three responsive layout geometries, each in light and dark variants. The selection breakpoints follow GitHub Primer’s viewport ranges and breakpoints rather than arbitrary image widths:
 
-| Variant | Intended rendered width | Primary layout |
+| Variant | Browser viewport | Primary layout |
 |---|---:|---|
-| Desktop | 720 px and above | Three-column capability grid, full activity composition |
-| Compact | 480–719 px | Two-column cards and stacked activity layout |
-| Mobile | Below 480 px | Single-column cards, two-column metrics, wrapped content |
+| Desktop | 1,004 px and above | Three-column capability grid, full activity composition |
+| Compact | 768–1,003 px | Two-column cards and stacked activity layout |
+| Mobile | Below 768 px | Single-column cards, two-column metrics, wrapped content |
 
 The README will use a `<picture>` element with viewport and colour-scheme media conditions to select one of six generated SVG assets:
 
@@ -70,7 +70,20 @@ The approved visual language will be shared through one component system. Each g
 
 ## 5. Responsive selection
 
-The generated README will select assets in this order:
+### 5.1 Feasibility gate
+
+Before the renderer is restructured, the branch will include a minimal responsive `<picture>` probe using harmless labelled test images. The probe must confirm in GitHub’s rendered branch view that:
+
+- GitHub preserves the `<picture>`, `<source>`, `media` and `srcset` attributes;
+- viewport-width media conditions select the intended source;
+- `prefers-color-scheme` continues to select light and dark variants;
+- the fallback image remains valid.
+
+If GitHub does not preserve width-based media selection in the rendered README, implementation stops and returns to design review rather than substituting an unapproved architecture.
+
+### 5.2 Production source order
+
+Once the feasibility gate passes, the generated README will select assets in this order:
 
 1. dark mobile;
 2. light mobile;
@@ -84,12 +97,12 @@ The target media conditions are:
 
 ```html
 <picture>
-  <source media="(prefers-color-scheme: dark) and (max-width: 479px)" srcset="./assets/profile-mobile-dark.svg">
-  <source media="(prefers-color-scheme: light) and (max-width: 479px)" srcset="./assets/profile-mobile-light.svg">
-  <source media="(prefers-color-scheme: dark) and (min-width: 480px) and (max-width: 719px)" srcset="./assets/profile-compact-dark.svg">
-  <source media="(prefers-color-scheme: light) and (min-width: 480px) and (max-width: 719px)" srcset="./assets/profile-compact-light.svg">
-  <source media="(prefers-color-scheme: dark)" srcset="./assets/profile-desktop-dark.svg">
-  <source media="(prefers-color-scheme: light)" srcset="./assets/profile-desktop-light.svg">
+  <source media="(prefers-color-scheme: dark) and (max-width: 767px)" srcset="./assets/profile-mobile-dark.svg">
+  <source media="(prefers-color-scheme: light) and (max-width: 767px)" srcset="./assets/profile-mobile-light.svg">
+  <source media="(prefers-color-scheme: dark) and (min-width: 768px) and (max-width: 1003px)" srcset="./assets/profile-compact-dark.svg">
+  <source media="(prefers-color-scheme: light) and (min-width: 768px) and (max-width: 1003px)" srcset="./assets/profile-compact-light.svg">
+  <source media="(prefers-color-scheme: dark) and (min-width: 1004px)" srcset="./assets/profile-desktop-dark.svg">
+  <source media="(prefers-color-scheme: light) and (min-width: 1004px)" srcset="./assets/profile-desktop-light.svg">
   <img src="./assets/profile-desktop-light.svg" width="100%" alt="Marc Levy — technology portfolio and GitHub activity">
 </picture>
 ```
@@ -274,6 +287,7 @@ Normal profile updates occur hourly at 17 minutes past the hour. Manual dispatch
 
 ### 11.1 Unit tests
 
+- responsive `<picture>` feasibility probe;
 - text measurement and word wrapping;
 - multiline vertical centring;
 - pill sizing;
@@ -304,8 +318,8 @@ For every generated asset:
 
 Render and inspect screenshots at:
 
-- 1440 px desktop;
-- 1024 px desktop;
+- 1,440 px desktop;
+- 1,024 px desktop;
 - 768 px compact;
 - 430 px mobile;
 - 375 px mobile.
@@ -337,14 +351,15 @@ Implementation remains isolated on `profile-responsive-layout-20260831` until th
 
 Deployment sequence:
 
-1. Implement renderer and collector changes on the branch.
-2. Generate all six assets using fixture data.
-3. Run the full automated test suite.
-4. Render light and dark previews at all five target widths.
-5. Review the previews against this specification and the approved original design.
-6. Open a pull request to `main` with the verification evidence.
-7. Merge only after approval.
-8. Trigger the live profile workflow and verify the public profile.
+1. Verify the responsive `<picture>` feasibility gate in GitHub’s branch rendering.
+2. Implement renderer and collector changes on the branch.
+3. Generate all six assets using fixture data.
+4. Run the full automated test suite.
+5. Render light and dark previews at all five target widths.
+6. Review the previews against this specification and the approved original design.
+7. Open a pull request to `main` with the verification evidence.
+8. Merge only after approval.
+9. Trigger the live profile workflow and verify the public profile.
 
 Rollback is a normal revert of the merge commit. The current desktop light and dark assets remain available in history and must not be overwritten before the responsive branch is approved.
 
@@ -354,7 +369,7 @@ The correction is accepted only when all of the following are true:
 
 1. The approved design and colour scheme are recognisably unchanged.
 2. Equitable Journeys remains absent.
-3. At 1440, 1024, 768, 430 and 375 px, no text clips, overflows or becomes illegible.
+3. At 1,440, 1,024, 768, 430 and 375 px, no text clips, overflows or becomes illegible.
 4. The page selects desktop, compact and mobile geometries rather than continuously shrinking one poster.
 5. Pills, category panels, chips, metric cards and focus items are internally aligned and uniform.
 6. Metric values are subordinate to the activity section heading.
