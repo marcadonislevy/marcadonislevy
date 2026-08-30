@@ -6,6 +6,7 @@ on:
       - main
     paths:
       - ".github/workflows/update-profile.yml"
+      - "source/profile-source-v9.zip"
   schedule:
     - cron: "23 4 * * *"
   workflow_dispatch:
@@ -18,7 +19,7 @@ concurrency:
   cancel-in-progress: false
 
 env:
-  PROFILE_SOURCE_SHA256: 771e1041017c280645c73d2b71b42a714fa96a088cd41e0a8238a87cc3691c64
+  PROFILE_SOURCE_SHA256: 1144052d22047bdee85a901ecd447ddb441bd75f48944bcd403f0cb37c7f445f
 
 jobs:
   refresh:
@@ -53,7 +54,7 @@ jobs:
         run: |
           set -euo pipefail
           rm -rf .profile-runtime .profile-runtime.zip
-          cat source/profile-source.b64.* | base64 --decode > .profile-runtime.zip
+          cp source/profile-source-v9.zip .profile-runtime.zip
           actual_sha256="$(sha256sum .profile-runtime.zip | cut -d' ' -f1)"
           if [[ "${actual_sha256}" != "${PROFILE_SOURCE_SHA256}" ]]; then
             echo "::error::Profile generator source failed its integrity check."
@@ -61,6 +62,9 @@ jobs:
           fi
           mkdir .profile-runtime
           unzip -q .profile-runtime.zip -d .profile-runtime
+          test -f .profile-runtime/package.json
+          test -f .profile-runtime/scripts/generate-profile.mjs
+          test -f .profile-runtime/scripts/verify-public-output.mjs
 
       - name: Run profile tests
         shell: bash
@@ -78,37 +82,6 @@ jobs:
           set -euo pipefail
           node .profile-runtime/scripts/generate-profile.mjs --output "${GITHUB_WORKSPACE}"
 
-      - name: Increase profile text legibility
-        shell: bash
-        run: |
-          set -euo pipefail
-          python3 <<'PY'
-          from pathlib import Path
-
-          replacements = {
-              ".tagline { font-size: 17px;": ".tagline { font-size: 18px;",
-              ".subtitle { font-size: 16px;": ".subtitle { font-size: 18px;",
-              ".section { font-size: 22px;": ".section { font-size: 23px;",
-              ".card-label { font-size: 16px;": ".card-label { font-size: 17px;",
-              ".category { font-size: 10px;": ".category { font-size: 12px;",
-              ".chip-text { font-size: 11px;": ".chip-text { font-size: 13px;",
-              ".metric-label { font-size: 11px;": ".metric-label { font-size: 13px;",
-              ".metric-value { font-size: 29px;": ".metric-value { font-size: 31px;",
-              ".metric-note { font-size: 10px;": ".metric-note { font-size: 12px;",
-              ".month { font-size: 10px;": ".month { font-size: 12px;",
-              ".focus { font-size: 13px;": ".focus { font-size: 15px;",
-          }
-
-          for filename in ("assets/profile-light.svg", "assets/profile-dark.svg"):
-              path = Path(filename)
-              text = path.read_text(encoding="utf-8")
-              for old, new in replacements.items():
-                  if text.count(old) != 1:
-                      raise SystemExit(f"Expected one occurrence of {old!r} in {filename}")
-                  text = text.replace(old, new)
-              path.write_text(text, encoding="utf-8")
-          PY
-
       - name: Verify generated public profile
         shell: bash
         run: |
@@ -118,10 +91,11 @@ jobs:
           const result = await verifyPublicOutput(process.cwd());
           console.log(`Verified ${result.files} public profile files.`);
           NODE
-          grep -q '.card-label { font-size: 17px;' assets/profile-light.svg
-          grep -q '.card-label { font-size: 17px;' assets/profile-dark.svg
-          grep -q '.pill { font-size: 13px;' assets/profile-light.svg
-          grep -q '.pill { font-size: 13px;' assets/profile-dark.svg
+          grep -q '.card-label { font-size: 24px;' assets/profile-light.svg
+          grep -q '.card-label { font-size: 24px;' assets/profile-dark.svg
+          grep -q '>Total</text>' assets/profile-light.svg
+          grep -q '>Total</text>' assets/profile-dark.svg
+          ! grep -qi '>Detected</text>' README.md assets/profile-light.svg assets/profile-dark.svg
           ! grep -qi 'Equitable Journeys' README.md assets/profile-light.svg assets/profile-dark.svg
           git diff --check
 
