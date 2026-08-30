@@ -27,18 +27,20 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
+          archive="${RUNNER_TEMP}/profile-responsive-layout-20260831.tar.gz"
           tar \
             --exclude=.git \
             --exclude=.superpowers \
             --exclude=node_modules \
             --exclude=preview-output \
-            -czf profile-responsive-layout-20260831.tar.gz .
+            -czf "${archive}" .
+          test -s "${archive}"
 
       - name: Upload repository archive
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
           name: profile-responsive-layout-20260831
-          path: profile-responsive-layout-20260831.tar.gz
+          path: ${{ runner.temp }}/profile-responsive-layout-20260831.tar.gz
           if-no-files-found: error
           retention-days: 1
           compression-level: 0
