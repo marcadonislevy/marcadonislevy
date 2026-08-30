@@ -1,10 +1,10 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-08-30T09:59:40.519Z",
+  "generatedAt": "2026-08-30T22:24:09.594Z",
   "source": "github-api",
   "contributions": {
-    "total": 3813,
-    "commits": 2762,
+    "total": 3859,
+    "commits": 2797,
     "last365Days": [
       {
         "date": "2025-08-31",
@@ -1460,25 +1460,25 @@
       },
       {
         "date": "2026-08-29",
-        "count": 59
+        "count": 73
       },
       {
         "date": "2026-08-30",
-        "count": 29
+        "count": 61
       }
     ]
   },
   "pullRequests": {
-    "authored": 971,
-    "open": 13,
-    "closed": 958,
-    "merged": 895,
-    "closedUnmerged": 63,
+    "authored": 981,
+    "open": 18,
+    "closed": 963,
+    "merged": 899,
+    "closedUnmerged": 64,
     "reviewed": 43
   },
   "issues": {
-    "authored": 60,
-    "open": 39,
+    "authored": 74,
+    "open": 53,
     "closed": 21
   },
   "repositories": {
@@ -1488,11 +1488,11 @@
     "total": 0
   },
   "languages": {
-    "detectedCount": 11,
+    "detectedCount": 10,
     "top": [
       {
         "name": "TypeScript",
-        "bytes": 11953960
+        "bytes": 11960826
       },
       {
         "name": "PLpgSQL",
@@ -1500,11 +1500,11 @@
       },
       {
         "name": "JavaScript",
-        "bytes": 690033
+        "bytes": 763382
       },
       {
         "name": "Python",
-        "bytes": 557298
+        "bytes": 571763
       },
       {
         "name": "HTML",
@@ -1525,10 +1525,6 @@
       {
         "name": "Astro",
         "bytes": 17821
-      },
-      {
-        "name": "Dockerfile",
-        "bytes": 642
       },
       {
         "name": "MDX",
