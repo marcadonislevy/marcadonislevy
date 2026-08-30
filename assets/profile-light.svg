@@ -19,11 +19,11 @@
       text { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
       .title { font-size: 52px; font-weight: 760; fill: #111827; }
       .username { font-size: 27px; font-weight: 520; fill: #6b7280; }
-      .tagline { font-size: 19px; font-weight: 650; fill: #111827; }
+      .tagline { font-size: 18px; font-weight: 650; fill: #111827; }
       .subtitle { font-size: 18px; font-weight: 470; fill: #6b7280; }
-      .pill { font-size: 15px; font-weight: 560; fill: #111827; }
+      .pill { font-size: 13px; font-weight: 560; fill: #111827; }
       .section { font-size: 23px; font-weight: 720; fill: #111827; }
-      .card-label { font-size: 18px; font-weight: 670; fill: #111827; }
+      .card-label { font-size: 17px; font-weight: 670; fill: #111827; }
       .category { font-size: 12px; font-weight: 720; letter-spacing: 0.8px; fill: #111827; }
       .chip-text { font-size: 13px; font-weight: 520; fill: #111827; }
       .metric-label { font-size: 13px; font-weight: 560; fill: #6b7280; }
