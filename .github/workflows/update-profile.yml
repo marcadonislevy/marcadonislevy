@@ -1,6 +1,12 @@
 name: Refresh profile activity
 
 on:
+  push:
+    branches:
+      - main
+    paths:
+      - ".github/workflows/update-profile.yml"
+      - "source/profile-source.b64.*"
   schedule:
     - cron: "23 4 * * *"
   workflow_dispatch:
@@ -13,7 +19,7 @@ concurrency:
   cancel-in-progress: false
 
 env:
-  PROFILE_SOURCE_SHA256: c3d70d263dbc02d7641d6d8366df5b9937ee08bd093a78b188feeef3d98a531a
+  PROFILE_SOURCE_SHA256: 6c579dd118c095f4c3e3dc743cee6ae5ce55998f19fe1aca774aec6808f65cd0
 
 jobs:
   refresh:
@@ -97,5 +103,5 @@ jobs:
           fi
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git commit -m "chore(profile): refresh GitHub activity"
+          git commit -m "chore(profile): publish native responsive README"
           git push origin "HEAD:${BRANCH_NAME}"
