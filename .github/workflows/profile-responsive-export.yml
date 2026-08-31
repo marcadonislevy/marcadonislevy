@@ -1,0 +1,46 @@
+name: Export responsive profile branch
+
+on:
+  push:
+    branches:
+      - profile-responsive-layout-20260831
+    paths:
+      - ".github/workflows/profile-responsive-export.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  export:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - name: Check out responsive profile branch
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: profile-responsive-layout-20260831
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Create repository archive
+        shell: bash
+        run: |
+          set -euo pipefail
+          archive="${RUNNER_TEMP}/profile-responsive-layout-20260831.tar.gz"
+          tar \
+            --exclude=.git \
+            --exclude=.superpowers \
+            --exclude=node_modules \
+            --exclude=preview-output \
+            -czf "${archive}" .
+          test -s "${archive}"
+
+      - name: Upload repository archive
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: profile-responsive-layout-20260831
+          path: ${{ runner.temp }}/profile-responsive-layout-20260831.tar.gz
+          if-no-files-found: error
+          retention-days: 1
+          compression-level: 0
