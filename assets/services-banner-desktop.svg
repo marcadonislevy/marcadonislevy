@@ -21,11 +21,10 @@
   <circle cx="1136" cy="54" r="5" fill="#62d9ff" opacity="0.45"/>
   <circle cx="905" cy="184" r="5" fill="#58a6ff" opacity="0.45"/>
   <circle cx="1148" cy="170" r="5" fill="#62d9ff" opacity="0.45"/>
-  <rect x="54" y="38" width="255" height="28" rx="14" fill="#123f70" stroke="#48bde9"/>
-  <circle cx="73" cy="52" r="5" fill="#62d9ff"/>
-  <text x="88" y="57" fill="#bfefff" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="13" font-weight="700" letter-spacing="1.4">AVAILABLE FOR WEBSITE PROJECTS</text>
+  <rect x="54" y="32" width="400" height="40" rx="20" fill="#123f70" stroke="#48bde9"/>
+  <text x="254" y="58" text-anchor="middle" fill="#bfefff" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="16" font-weight="700" letter-spacing="0.8"><tspan fill="#62d9ff">●</tspan><tspan dx="10">AVAILABLE FOR WEBSITE PROJECTS</tspan></text>
   <text x="54" y="121" fill="#ffffff" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="43" font-weight="750" letter-spacing="-1">Website Design &amp; Development</text>
   <text x="55" y="158" fill="#b9cce3" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="18">Business websites · personal sites · secure intranets · web portals</text>
-  <rect x="54" y="178" width="155" height="36" rx="10" fill="url(#accent)"/>
-  <text x="79" y="202" fill="#06162e" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="15" font-weight="800">VIEW SERVICES →</text>
+  <rect x="54" y="174" width="210" height="44" rx="11" fill="url(#accent)"/>
+  <text x="159" y="203" text-anchor="middle" fill="#06162e" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="17" font-weight="800" letter-spacing="0.2">VIEW SERVICES →</text>
 </svg>
