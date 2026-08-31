@@ -1,0 +1,55 @@
+name: Preview responsive profile
+
+on:
+  pull_request:
+    paths:
+      - "README.template.md"
+      - "scripts/**"
+      - "test/**"
+      - "package.json"
+      - ".github/workflows/profile-responsive-preview.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  preview:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - name: Check out branch
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Set up Node.js
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: "24.18.1"
+          package-manager-cache: false
+
+      - name: Test and generate fixture assets
+        run: |
+          set -euo pipefail
+          npm test
+          rm -rf preview-output preview-evidence
+          node scripts/generate-profile.mjs --fixture test/fixture-stats.json --output preview-output
+          node scripts/verify-public-output.mjs --root preview-output
+
+      - name: Render ten viewport previews
+        run: |
+          set -euo pipefail
+          python3 -m pip install --disable-pip-version-check cairosvg==2.8.2
+          python3 scripts/render-responsive-previews.py \
+            --input preview-output/assets \
+            --output preview-evidence
+
+      - name: Upload preview evidence
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: responsive-profile-previews
+          path: preview-evidence
+          if-no-files-found: error
+          retention-days: 7

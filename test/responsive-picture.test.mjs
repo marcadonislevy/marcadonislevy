@@ -2,8 +2,8 @@ import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 import test from "node:test";
 
-test("probe declares mobile, compact and desktop sources in priority order", async () => {
-  const markdown = await readFile("docs/probes/responsive-picture.md", "utf8");
+test("production README declares mobile, compact and desktop sources in priority order", async () => {
+  const markdown = await readFile("README.template.md", "utf8");
   const media = [
     "(prefers-color-scheme: dark) and (max-width: 767px)",
     "(prefers-color-scheme: light) and (max-width: 767px)",
@@ -18,5 +18,5 @@ test("probe declares mobile, compact and desktop sources in priority order", asy
     assert.ok(next > cursor, `missing or misordered source: ${value}`);
     cursor = next;
   }
-  assert.match(markdown, /profile-probe-desktop-light\.svg/);
+  assert.match(markdown, /profile-desktop-light\.svg/);
 });

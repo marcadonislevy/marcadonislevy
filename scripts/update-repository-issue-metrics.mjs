@@ -5,6 +5,8 @@ import path from "node:path";
 import process from "node:process";
 import { fileURLToPath } from "node:url";
 
+import { RESPONSIVE_ASSET_NAMES, renderAllProfiles } from "./render-profile.mjs";
+
 const DEFAULT_GRAPHQL_URL = "https://api.github.com/graphql";
 const modulePath = fileURLToPath(import.meta.url);
 const profileRoot = path.resolve(path.dirname(modulePath), "..");
@@ -126,19 +128,6 @@ export async function collectRepositoryIssueCounts({
   };
 }
 
-export function replaceIssueCard(svg, counts) {
-  const pattern = /(<text[^>]*class="metric-label">Issues<\/text><text[^>]*class="metric-value">)([^<]*)(<\/text><text[^>]*class="metric-note">)([^<]*)(<\/text><text[^>]*class="metric-note">)([^<]*)(<\/text>)/;
-  const matches = svg.match(new RegExp(pattern.source, "g")) ?? [];
-  if (matches.length !== 1) {
-    throw new Error(`Expected exactly one Issues metric card, found ${matches.length}.`);
-  }
-
-  return svg.replace(
-    pattern,
-    `$1${counts.total.toLocaleString("en-US")}$3${counts.open.toLocaleString("en-US")} open$5${counts.closed.toLocaleString("en-US")} closed$7`,
-  );
-}
-
 export async function updateRepositoryIssueMetrics({
   rootDirectory = profileRoot,
   token,
@@ -154,14 +143,7 @@ export async function updateRepositoryIssueMetrics({
   });
 
   const statsPath = path.join(rootDirectory, "assets", "stats.json");
-  const lightPath = path.join(rootDirectory, "assets", "profile-light.svg");
-  const darkPath = path.join(rootDirectory, "assets", "profile-dark.svg");
-
-  const [statsText, lightSvg, darkSvg] = await Promise.all([
-    readFile(statsPath, "utf8"),
-    readFile(lightPath, "utf8"),
-    readFile(darkPath, "utf8"),
-  ]);
+  const statsText = await readFile(statsPath, "utf8");
 
   const stats = JSON.parse(statsText);
   stats.issues = {
@@ -172,13 +154,13 @@ export async function updateRepositoryIssueMetrics({
     closed: counts.closed,
   };
 
-  const nextLightSvg = replaceIssueCard(lightSvg, counts);
-  const nextDarkSvg = replaceIssueCard(darkSvg, counts);
+  const outputs = renderAllProfiles(stats);
 
   await Promise.all([
     writeFile(statsPath, `${JSON.stringify(stats, null, 2)}\n`, "utf8"),
-    writeFile(lightPath, nextLightSvg, "utf8"),
-    writeFile(darkPath, nextDarkSvg, "utf8"),
+    ...RESPONSIVE_ASSET_NAMES.map((name) => (
+      writeFile(path.join(rootDirectory, "assets", name), outputs[name].svg, "utf8")
+    )),
   ]);
 
   return counts;

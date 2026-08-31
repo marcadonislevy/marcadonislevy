@@ -4,5 +4,12 @@ node_modules/
 .profile-build-*
 .profile-runtime/
 .profile-runtime.zip
+.profile-package/
 preview-output/
+preview-evidence/
+playwright-report/
+test-results/
 .DS_Store
+
+__pycache__/
+*.pyc

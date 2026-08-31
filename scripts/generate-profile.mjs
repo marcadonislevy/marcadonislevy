@@ -11,7 +11,8 @@ import {
 import path from "node:path";
 import process from "node:process";
 import { fileURLToPath } from "node:url";
-import { renderProfile } from "./render-profile.mjs";
+
+import { RESPONSIVE_ASSET_NAMES, renderAllProfiles } from "./render-profile.mjs";
 import { validateStats } from "./stats-policy.mjs";
 
 const API_VERSION = "2022-11-28";
@@ -20,11 +21,9 @@ const profileRoot = path.resolve(path.dirname(modulePath), "..");
 
 export async function generateFromStats(stats, outputDirectory = profileRoot) {
   validateStats(stats);
-
-  const lightSvg = renderProfile(stats, "light");
-  const darkSvg = renderProfile(stats, "dark");
+  const outputs = renderAllProfiles(stats);
   const template = await readFile(path.join(profileRoot, "README.template.md"), "utf8");
-  assertGeneratedContent({ template, lightSvg, darkSvg });
+  assertGeneratedContent(template, outputs);
 
   await mkdir(outputDirectory, { recursive: true });
   const staging = await mkdtemp(path.join(outputDirectory, ".profile-build-"));
@@ -33,8 +32,9 @@ export async function generateFromStats(stats, outputDirectory = profileRoot) {
 
   try {
     await Promise.all([
-      writeFile(path.join(stagingAssets, "profile-light.svg"), lightSvg, "utf8"),
-      writeFile(path.join(stagingAssets, "profile-dark.svg"), darkSvg, "utf8"),
+      ...Object.entries(outputs).map(([name, result]) => (
+        writeFile(path.join(stagingAssets, name), result.svg, "utf8")
+      )),
       writeFile(
         path.join(stagingAssets, "stats.json"),
         `${JSON.stringify(toPublicSnapshot(stats), null, 2)}\n`,
@@ -45,13 +45,19 @@ export async function generateFromStats(stats, outputDirectory = profileRoot) {
 
     const outputAssets = path.join(outputDirectory, "assets");
     await mkdir(outputAssets, { recursive: true });
-    await rename(path.join(stagingAssets, "profile-light.svg"), path.join(outputAssets, "profile-light.svg"));
-    await rename(path.join(stagingAssets, "profile-dark.svg"), path.join(outputAssets, "profile-dark.svg"));
+    for (const name of RESPONSIVE_ASSET_NAMES) {
+      await rename(path.join(stagingAssets, name), path.join(outputAssets, name));
+    }
     await rename(path.join(stagingAssets, "stats.json"), path.join(outputAssets, "stats.json"));
     await rename(path.join(staging, "README.md"), path.join(outputDirectory, "README.md"));
+    await Promise.all([
+      rm(path.join(outputAssets, "profile-light.svg"), { force: true }),
+      rm(path.join(outputAssets, "profile-dark.svg"), { force: true }),
+    ]);
   } finally {
     await rm(staging, { recursive: true, force: true });
   }
+  return outputs;
 }
 
 export async function collectStats({
@@ -65,7 +71,9 @@ export async function collectStats({
 }) {
   if (!login || typeof login !== "string") throw new Error("A GitHub login is required.");
   if (!token || typeof token !== "string") throw new Error("A GitHub token is required.");
-  if (!(now instanceof Date) || Number.isNaN(now.getTime())) throw new Error("A valid collection time is required.");
+  if (!(now instanceof Date) || Number.isNaN(now.getTime())) {
+    throw new Error("A valid collection time is required.");
+  }
 
   const owners = new Set(
     [...ownerLogins, login]
@@ -96,11 +104,6 @@ export async function collectStats({
     throw new Error("GitHub account metadata was unavailable.");
   }
 
-  const issueQueries = {
-    authored: `author:${login} is:issue`,
-    open: `author:${login} is:issue is:open`,
-    closed: `author:${login} is:issue is:closed`,
-  };
   const pullRequestQueries = {
     authored: `author:${login} is:pr`,
     open: `author:${login} is:pr is:open`,
@@ -110,15 +113,14 @@ export async function collectStats({
     reviewed: `reviewed-by:${login} is:pr`,
   };
 
-  const [issues, pullRequests, commits, contributions, repositories] = await Promise.all([
-    fetchSearchCounts(issueQueries, { fetchImpl, restUrl, headers }),
+  const [pullRequests, commits, contributions, repositories] = await Promise.all([
     fetchSearchCounts(pullRequestQueries, { fetchImpl, restUrl, headers }),
     fetchCommitCount(login, { fetchImpl, restUrl, headers }),
     collectContributionHistory({ login, token, createdAt, now, fetchImpl, graphqlUrl }),
     collectRepositoryAggregates({ token, owners, fetchImpl, graphqlUrl }),
   ]);
 
-  const stats = {
+  return validateStats({
     schemaVersion: 1,
     generatedAt: now.toISOString(),
     source: "github-api",
@@ -128,13 +130,11 @@ export async function collectStats({
       last365Days: contributions.last365Days,
     },
     pullRequests,
-    issues,
+    issues: repositories.issues,
     repositories: repositories.repositories,
     stars: { total: repositories.stars },
     languages: repositories.languages,
-  };
-
-  return validateStats(stats);
+  });
 }
 
 async function fetchSearchCounts(queries, context) {
@@ -157,7 +157,8 @@ async function fetchSearchCount(query, { fetchImpl, restUrl, headers }) {
 }
 
 async function fetchCommitCount(login, { fetchImpl, restUrl, headers }) {
-  const url = `${restUrl.replace(/\/$/, "")}/search/commits?q=${encodeURIComponent(`author:${login}`)}&per_page=1`;
+  const query = encodeURIComponent(`author:${login}`);
+  const url = `${restUrl.replace(/\/$/, "")}/search/commits?q=${query}&per_page=1`;
   const data = await fetchJson(fetchImpl, url, { headers }, "GitHub commit search");
   if (!Number.isSafeInteger(data.total_count) || data.total_count < 0) {
     throw new Error("GitHub commit search returned an invalid count.");
@@ -177,10 +178,13 @@ async function collectContributionHistory({
   const endExclusive = addUtcDays(startOfUtcDay(now), 1);
   if (start >= endExclusive) throw new Error("GitHub account creation date is invalid.");
 
-  const daily = new Map();
-  for (let windowStart = start; windowStart < endExclusive; windowStart = addUtcDays(windowStart, 180)) {
+  const allDays = new Map();
+  for (
+    let windowStart = start;
+    windowStart < endExclusive;
+    windowStart = addUtcDays(windowStart, 180)
+  ) {
     const windowEndExclusive = minDate(addUtcDays(windowStart, 180), endExclusive);
-    const windowEnd = new Date(windowEndExclusive.getTime() - 1);
     const data = await fetchGraphql({
       fetchImpl,
       graphqlUrl,
@@ -192,7 +196,7 @@ async function collectContributionHistory({
             contributionsCollection(from: $from, to: $to) {
               contributionCalendar {
                 weeks {
-                  contributionDays { date contributionCount }
+                  contributionDays { date contributionCount contributionLevel }
                 }
               }
             }
@@ -202,35 +206,96 @@ async function collectContributionHistory({
       variables: {
         login,
         from: windowStart.toISOString(),
-        to: windowEnd.toISOString(),
+        to: new Date(windowEndExclusive.getTime() - 1).toISOString(),
       },
     });
     const calendar = data?.user?.contributionsCollection?.contributionCalendar;
     if (!calendar) throw new Error("GitHub contribution history was unavailable.");
-    for (const week of calendar.weeks ?? []) {
-      for (const day of week.contributionDays ?? []) {
-        if (typeof day.date !== "string" || !Number.isSafeInteger(day.contributionCount)) continue;
-        daily.set(day.date, Math.max(daily.get(day.date) ?? 0, day.contributionCount));
-      }
-    }
+    collectCalendarDays(calendar, allDays);
   }
 
-  const allDays = [...daily.entries()]
-    .map(([date, count]) => ({ date, count }))
-    .sort((a, b) => a.date.localeCompare(b.date));
-  const total = allDays.reduce((sum, day) => sum + day.count, 0);
-  const last365Start = addUtcDays(startOfUtcDay(now), -364);
+  const recentStart = addUtcDays(startOfUtcDay(now), -364);
+  const recentData = await fetchGraphql({
+    fetchImpl,
+    graphqlUrl,
+    token,
+    label: "recent contribution levels",
+    query: `
+      query RecentContributionCalendar($login: String!, $from: DateTime!, $to: DateTime!) {
+        user(login: $login) {
+          contributionsCollection(from: $from, to: $to) {
+            contributionCalendar {
+              weeks {
+                contributionDays { date contributionCount contributionLevel }
+              }
+            }
+          }
+        }
+      }
+    `,
+    variables: {
+      login,
+      from: recentStart.toISOString(),
+      to: new Date(endExclusive.getTime() - 1).toISOString(),
+    },
+  });
+  const recentCalendar = recentData?.user?.contributionsCollection?.contributionCalendar;
+  if (!recentCalendar) throw new Error("GitHub recent contribution levels were unavailable.");
+  const recentDays = new Map();
+  collectCalendarDays(recentCalendar, recentDays);
+
+  const total = [...allDays.values()].reduce((sum, day) => sum + day.count, 0);
   const last365Days = [];
   for (let index = 0; index < 365; index += 1) {
-    const date = addUtcDays(last365Start, index).toISOString().slice(0, 10);
-    last365Days.push({ date, count: daily.get(date) ?? 0 });
+    const date = addUtcDays(recentStart, index).toISOString().slice(0, 10);
+    const day = recentDays.get(date) ?? allDays.get(date) ?? { count: 0, level: "NONE" };
+    last365Days.push({
+      date,
+      count: day.count,
+      level: day.level,
+    });
   }
   return { total, last365Days };
+}
+
+function collectCalendarDays(calendar, target) {
+  for (const week of calendar.weeks ?? []) {
+    for (const day of week.contributionDays ?? []) {
+      if (
+        typeof day.date !== "string"
+        || !Number.isSafeInteger(day.contributionCount)
+        || day.contributionCount < 0
+      ) {
+        continue;
+      }
+      target.set(day.date, {
+        count: day.contributionCount,
+        level: normaliseLevel(day.contributionLevel, day.contributionCount),
+      });
+    }
+  }
+}
+
+function normaliseLevel(level, count) {
+  const allowed = new Set([
+    "NONE",
+    "FIRST_QUARTILE",
+    "SECOND_QUARTILE",
+    "THIRD_QUARTILE",
+    "FOURTH_QUARTILE",
+  ]);
+  if (allowed.has(level)) return level;
+  if (count <= 0) return "NONE";
+  if (count <= 2) return "FIRST_QUARTILE";
+  if (count <= 5) return "SECOND_QUARTILE";
+  if (count <= 9) return "THIRD_QUARTILE";
+  return "FOURTH_QUARTILE";
 }
 
 async function collectRepositoryAggregates({ token, owners, fetchImpl, graphqlUrl }) {
   const languageBytes = new Map();
   const repositories = { total: 0, public: 0, private: 0 };
+  const issues = { authored: 0, open: 0, closed: 0 };
   let stars = 0;
   let after = null;
 
@@ -255,6 +320,8 @@ async function collectRepositoryAggregates({ token, owners, fetchImpl, graphqlUr
                 isFork
                 stargazerCount
                 owner { login }
+                openIssues: issues(states: [OPEN]) { totalCount }
+                closedIssues: issues(states: [CLOSED]) { totalCount }
                 languages(first: 100, orderBy: { field: SIZE, direction: DESC }) {
                   edges { size node { name } }
                 }
@@ -267,15 +334,24 @@ async function collectRepositoryAggregates({ token, owners, fetchImpl, graphqlUr
       variables: { after },
     });
     const connection = data?.viewer?.repositories;
-    if (!connection) throw new Error("GitHub repository aggregate was unavailable.");
+    if (!connection || !Array.isArray(connection.nodes)) {
+      throw new Error("GitHub repository aggregate was unavailable.");
+    }
 
-    for (const repository of connection.nodes ?? []) {
+    for (const repository of connection.nodes) {
       const owner = repository.owner?.login?.toLowerCase();
       if (!owner || !owners.has(owner)) continue;
+      const open = repository.openIssues?.totalCount;
+      const closed = repository.closedIssues?.totalCount;
+      if (!Number.isSafeInteger(open) || open < 0 || !Number.isSafeInteger(closed) || closed < 0) {
+        throw new Error("GitHub repository aggregate returned invalid issue totals.");
+      }
 
       repositories.total += 1;
       if (repository.isPrivate) repositories.private += 1;
       else repositories.public += 1;
+      issues.open += open;
+      issues.closed += closed;
 
       if (!repository.isPrivate && !repository.isFork) {
         stars += Number.isSafeInteger(repository.stargazerCount) ? repository.stargazerCount : 0;
@@ -292,14 +368,18 @@ async function collectRepositoryAggregates({ token, owners, fetchImpl, graphqlUr
     }
 
     after = connection.pageInfo?.hasNextPage ? connection.pageInfo.endCursor : null;
+    if (connection.pageInfo?.hasNextPage && !after) {
+      throw new Error("GitHub repository aggregate did not return its next cursor.");
+    }
   } while (after);
 
+  issues.authored = issues.open + issues.closed;
   const top = [...languageBytes.entries()]
     .map(([name, bytes]) => ({ name, bytes }))
     .sort((a, b) => b.bytes - a.bytes);
-
   return {
     repositories,
+    issues,
     stars,
     languages: {
       detectedCount: top.length,
@@ -325,7 +405,7 @@ async function fetchGraphql({ fetchImpl, graphqlUrl, token, label, query, variab
     label,
   );
   if (Array.isArray(data.errors) && data.errors.length > 0) {
-    throw new Error(`${label} returned a GraphQL error.`);
+    throw new Error(label + " returned a GraphQL error.");
   }
   return data.data;
 }
@@ -338,7 +418,7 @@ async function fetchJson(fetchImpl, url, options, label) {
   try {
     return await response.json();
   } catch {
-    throw new Error(`${label} returned invalid JSON.`);
+    throw new Error(label + " returned invalid JSON.");
   }
 }
 
@@ -356,19 +436,26 @@ function toPublicSnapshot(stats) {
   };
 }
 
-function assertGeneratedContent({ template, lightSvg, darkSvg }) {
-  if (!template.includes("prefers-color-scheme: dark") || !template.includes("profile-light.svg")) {
-    throw new Error("README template is not theme-aware.");
-  }
-  for (const [label, content] of [["light SVG", lightSvg], ["dark SVG", darkSvg]]) {
-    if (!content.startsWith("<svg") || /\b(?:AWAITING|PENDING)\b/i.test(content)) {
-      throw new Error(`${label} is incomplete.`);
+function assertGeneratedContent(template, outputs) {
+  for (const name of RESPONSIVE_ASSET_NAMES) {
+    if (!template.includes(name)) throw new Error("README template is missing " + name + ".");
+    const svg = outputs[name]?.svg;
+    if (!svg?.startsWith("<svg") || /\b(?:AWAITING|PENDING)\b/i.test(svg)) {
+      throw new Error(name + " is incomplete.");
     }
+  }
+  if (!template.includes("prefers-color-scheme: dark") || !template.includes("max-width: 767px")) {
+    throw new Error("README template is not responsive and theme-aware.");
   }
 }
 
 function parseList(value) {
-  return [...new Set(String(value ?? "").split(/[\n,]/).map((entry) => entry.trim()).filter(Boolean))];
+  return [...new Set(
+    String(value ?? "")
+      .split(/[\n,]/)
+      .map((entry) => entry.trim())
+      .filter(Boolean),
+  )];
 }
 
 function startOfUtcDay(date) {
@@ -397,7 +484,7 @@ async function runCli() {
     if (!fixturePath) throw new Error("--fixture requires a JSON file path.");
     const fixture = JSON.parse(await readFile(path.resolve(fixturePath), "utf8"));
     await generateFromStats(fixture, outputDirectory);
-    console.log(`Generated verified fixture profile in ${outputDirectory}.`);
+    console.log("Generated verified fixture profile in " + outputDirectory + ".");
     return;
   }
 
@@ -407,7 +494,7 @@ async function runCli() {
   const ownerLogins = parseList(process.env.PROFILE_OWNER_LOGINS || login);
   const stats = await collectStats({ login, token, ownerLogins });
   await generateFromStats(stats, outputDirectory);
-  console.log(`Generated verified GitHub profile in ${outputDirectory}.`);
+  console.log("Generated verified GitHub profile in " + outputDirectory + ".");
 }
 
 if (process.argv[1] && path.resolve(process.argv[1]) === modulePath) {

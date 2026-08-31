@@ -6,11 +6,12 @@ on:
       - main
     paths:
       - ".github/workflows/update-profile.yml"
-      - "source/profile-source.b64.*"
-      - "scripts/update-repository-issue-metrics.mjs"
-      - "test/repository-issue-metrics.test.mjs"
+      - "README.template.md"
+      - "config/profile.json"
+      - "package.json"
+      - "scripts/**"
+      - "test/**"
   schedule:
-    # Refresh automatically every hour, away from the top-of-hour peak.
     - cron: "17 * * * *"
   workflow_dispatch:
 
@@ -21,20 +22,14 @@ concurrency:
   group: profile-activity
   cancel-in-progress: false
 
-env:
-  PROFILE_SOURCE_SHA256: 1144052d22047bdee85a901ecd447ddb441bd75f48944bcd403f0cb37c7f445f
-
 jobs:
   refresh:
     runs-on: ubuntu-24.04
     timeout-minutes: 20
-
     steps:
       - name: Check out current profile branch
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
-          # A re-run retains the original event SHA. Resolve the branch name
-          # explicitly so a later re-run starts from the current branch tip.
           ref: ${{ github.ref_name }}
           fetch-depth: 0
           persist-credentials: true
@@ -55,31 +50,13 @@ jobs:
           test -n "${PROFILE_STATS_TOKEN}" || { echo "::error::PROFILE_STATS_TOKEN is not configured."; exit 1; }
           test -n "${PROFILE_OWNER_LOGINS}" || { echo "::error::PROFILE_OWNER_LOGINS is not configured."; exit 1; }
 
-      - name: Restore validated generator source
+      - name: Run responsive renderer tests
         shell: bash
         run: |
           set -euo pipefail
-          rm -rf .profile-runtime .profile-runtime.zip
-          cat source/profile-source.b64.* | base64 --decode > .profile-runtime.zip
-          actual_sha256="$(sha256sum .profile-runtime.zip | cut -d' ' -f1)"
-          if [[ "${actual_sha256}" != "${PROFILE_SOURCE_SHA256}" ]]; then
-            echo "::error::Profile generator source failed its integrity check."
-            exit 1
-          fi
-          mkdir .profile-runtime
-          unzip -q .profile-runtime.zip -d .profile-runtime
-          test -f .profile-runtime/package.json
-          test -f .profile-runtime/scripts/generate-profile.mjs
-          test -f .profile-runtime/scripts/verify-public-output.mjs
+          npm test
 
-      - name: Run profile tests
-        shell: bash
-        run: |
-          set -euo pipefail
-          npm --prefix .profile-runtime test
-          node --test test/repository-issue-metrics.test.mjs
-
-      - name: Generate profile from GitHub data
+      - name: Generate six responsive profile assets
         shell: bash
         env:
           PROFILE_LOGIN: ${{ github.repository_owner }}
@@ -87,16 +64,7 @@ jobs:
           PROFILE_OWNER_LOGINS: ${{ secrets.PROFILE_OWNER_LOGINS }}
         run: |
           set -euo pipefail
-          node .profile-runtime/scripts/generate-profile.mjs --output "${GITHUB_WORKSPACE}"
-
-      - name: Aggregate issues across selected repositories
-        shell: bash
-        env:
-          PROFILE_STATS_TOKEN: ${{ secrets.PROFILE_STATS_TOKEN }}
-          PROFILE_OWNER_LOGINS: ${{ secrets.PROFILE_OWNER_LOGINS }}
-        run: |
-          set -euo pipefail
-          node scripts/update-repository-issue-metrics.mjs
+          node scripts/generate-profile.mjs --output "${GITHUB_WORKSPACE}"
 
       - name: Suppress timestamp-only changes
         shell: bash
@@ -105,19 +73,12 @@ jobs:
           node --input-type=module <<'NODE'
           const { execFileSync } = await import("node:child_process");
           const { readFile, writeFile } = await import("node:fs/promises");
-
           let previousText;
           try {
-            previousText = execFileSync(
-              "git",
-              ["show", "HEAD:assets/stats.json"],
-              { encoding: "utf8" },
-            );
+            previousText = execFileSync("git", ["show", "HEAD:assets/stats.json"], { encoding: "utf8" });
           } catch {
-            console.log("No previous statistics snapshot is available for comparison.");
             process.exit(0);
           }
-
           const previous = JSON.parse(previousText);
           const currentPath = "assets/stats.json";
           const current = JSON.parse(await readFile(currentPath, "utf8"));
@@ -126,7 +87,6 @@ jobs:
             delete clone.generatedAt;
             return JSON.stringify(clone);
           };
-
           if (comparable(previous) === comparable(current)) {
             current.generatedAt = previous.generatedAt;
             await writeFile(currentPath, `${JSON.stringify(current, null, 2)}\n`, "utf8");
@@ -136,39 +96,15 @@ jobs:
 
       - name: Verify generated public profile
         shell: bash
+        env:
+          PROFILE_DENYLIST: ${{ secrets.PROFILE_DENYLIST }}
         run: |
           set -euo pipefail
-          node --input-type=module <<'NODE'
-          const { readFile } = await import("node:fs/promises");
-          const { verifyPublicOutput } = await import("./.profile-runtime/scripts/verify-public-output.mjs");
-          const result = await verifyPublicOutput(process.cwd());
-          console.log(`Verified ${result.files} public profile files.`);
-
-          const stats = JSON.parse(await readFile("assets/stats.json", "utf8"));
-          if (stats.issues.authored !== stats.issues.open + stats.issues.closed) {
-            throw new Error("Repository issue totals are internally inconsistent.");
-          }
-          for (const filename of ["assets/profile-light.svg", "assets/profile-dark.svg"]) {
-            const svg = await readFile(filename, "utf8");
-            const expected = [
-              stats.issues.authored.toLocaleString("en-US"),
-              `${stats.issues.open.toLocaleString("en-US")} open`,
-              `${stats.issues.closed.toLocaleString("en-US")} closed`,
-            ];
-            for (const value of expected) {
-              if (!svg.includes(`>${value}</text>`)) {
-                throw new Error(`${filename} does not contain the repository issue value ${value}.`);
-              }
-            }
-          }
-          NODE
-          grep -q '.card-label { font-size: 24px;' assets/profile-light.svg
-          grep -q '.card-label { font-size: 24px;' assets/profile-dark.svg
-          grep -q '>Total</text>' assets/profile-light.svg
-          grep -q '>Total</text>' assets/profile-dark.svg
-          ! grep -qi '>Detected</text>' README.md assets/profile-light.svg assets/profile-dark.svg
-          ! grep -qi 'Equitable Journeys' README.md assets/profile-light.svg assets/profile-dark.svg
+          node scripts/verify-public-output.mjs
           git diff --check
+          test ! -e assets/profile-light.svg
+          test ! -e assets/profile-dark.svg
+          test ! -e source/profile-source.b64.00
 
       - name: Commit refreshed profile
         shell: bash
@@ -176,33 +112,27 @@ jobs:
           BRANCH_NAME: ${{ github.ref_name }}
         run: |
           set -euo pipefail
-          git add README.md assets/profile-light.svg assets/profile-dark.svg assets/stats.json
+          git add README.md assets/profile-*-light.svg assets/profile-*-dark.svg assets/stats.json
+          git add -u assets
           if git diff --cached --quiet; then
             echo "No profile changes to commit."
             exit 0
           fi
-
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git commit -m "chore(profile): refresh approved visual profile"
-
-          # A branch may still advance after checkout. Rebase and retry a
-          # bounded number of times; never force-push over newer work.
+          git commit -m "chore(profile): refresh responsive visual profile"
           for attempt in 1 2 3; do
             if git push origin "HEAD:${BRANCH_NAME}"; then
               exit 0
             fi
-
             if [[ "${attempt}" -eq 3 ]]; then
               echo "::error::Remote branch changed repeatedly; profile commit was not published."
               exit 1
             fi
-
-            echo "Remote branch advanced; rebasing profile commit (attempt ${attempt}/3)."
             git fetch origin "${BRANCH_NAME}"
             if ! git rebase "origin/${BRANCH_NAME}"; then
               git rebase --abort || true
-              echo "::error::Generated profile conflicts with newer work on ${BRANCH_NAME}; refusing to overwrite it."
+              echo "::error::Generated profile conflicts with newer work; refusing to overwrite it."
               exit 1
             fi
           done

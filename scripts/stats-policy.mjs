@@ -1,4 +1,11 @@
 const PLACEHOLDER_PATTERN = /\b(?:AWAITING|PENDING|PLACEHOLDER|DEMO|PREVIEW)\b/i;
+const CONTRIBUTION_LEVELS = new Set([
+  "NONE",
+  "FIRST_QUARTILE",
+  "SECOND_QUARTILE",
+  "THIRD_QUARTILE",
+  "FOURTH_QUARTILE",
+]);
 
 export function validateStats(stats) {
   if (!stats || typeof stats !== "object" || Array.isArray(stats)) {
@@ -97,6 +104,9 @@ function validateCalendar(value, generatedAt) {
       throw new Error("Contribution history contains an invalid calendar date.");
     }
     requireCount(day.count, `contribution count for ${day.date}`);
+    if (!CONTRIBUTION_LEVELS.has(day.level)) {
+      throw new Error(`Contribution history contains an invalid GitHub level for ${day.date}.`);
+    }
     if (dates.has(day.date)) {
       throw new Error("Contribution history contains a duplicate date.");
     }

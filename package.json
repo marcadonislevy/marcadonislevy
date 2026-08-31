@@ -1,14 +1,15 @@
 {
   "name": "marcadonislevy-profile",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "private": true,
   "type": "module",
   "engines": {
-    "node": ">=24.18.1"
+    "node": ">=22.0.0"
   },
   "scripts": {
     "test": "node --test test/*.test.mjs",
     "generate": "node scripts/generate-profile.mjs",
-    "verify": "node scripts/verify-public-output.mjs"
+    "verify": "node scripts/verify-public-output.mjs",
+    "preview": "node scripts/generate-profile.mjs --fixture test/fixture-stats.json --output preview-output"
   }
 }
