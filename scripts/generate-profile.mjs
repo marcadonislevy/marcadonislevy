@@ -244,6 +244,14 @@ async function collectContributionHistory({
   const recentDays = new Map();
   collectCalendarDays(recentCalendar, recentDays);
 
+  // The recent calendar is fetched after the historical windows. Activity can
+  // land between those requests, so use the newer values for overlapping days
+  // before calculating the all-time total. This keeps one GitHub snapshot
+  // internally consistent without understating either the total or the graph.
+  for (const [date, day] of recentDays) {
+    allDays.set(date, day);
+  }
+
   const total = [...allDays.values()].reduce((sum, day) => sum + day.count, 0);
   const last365Days = [];
   for (let index = 0; index < 365; index += 1) {

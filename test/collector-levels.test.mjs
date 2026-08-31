@@ -27,7 +27,7 @@ test("collector publishes GitHub contribution levels and repository-wide issue t
       if (query.includes("RecentContributionCalendar")) return Response.json({ data: { user: { contributionsCollection: { contributionCalendar: { weeks: [{ contributionDays: [
         { date: "2026-08-27", contributionCount: 1, contributionLevel: "FIRST_QUARTILE" },
         { date: "2026-08-28", contributionCount: 3, contributionLevel: "THIRD_QUARTILE" },
-        { date: "2026-08-29", contributionCount: 6, contributionLevel: "FOURTH_QUARTILE" },
+        { date: "2026-08-29", contributionCount: 7, contributionLevel: "FOURTH_QUARTILE" },
       ] }] } } } } });
       if (query.includes("RepositoryAggregate")) return Response.json({ data: { viewer: { repositories: {
         nodes: [
@@ -55,6 +55,7 @@ test("collector publishes GitHub contribution levels and repository-wide issue t
   assert.equal(stats.contributions.last365Days.at(-3).level, "FIRST_QUARTILE");
   assert.equal(stats.contributions.last365Days.at(-2).level, "THIRD_QUARTILE");
   assert.equal(stats.contributions.last365Days.at(-1).level, "FOURTH_QUARTILE");
+  assert.equal(stats.contributions.total, 11);
   assert.equal(stats.repositories.total, 2);
   assert.equal(stats.stars.total, 7);
 });
