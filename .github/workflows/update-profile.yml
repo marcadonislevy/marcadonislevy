@@ -96,8 +96,6 @@ jobs:
 
       - name: Verify generated public profile
         shell: bash
-        env:
-          PROFILE_DENYLIST: ${{ secrets.PROFILE_DENYLIST }}
         run: |
           set -euo pipefail
           node scripts/verify-public-output.mjs
