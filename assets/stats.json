@@ -1,15 +1,11 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-08-30T22:39:25.039Z",
+  "generatedAt": "2026-08-31T01:23:07.203Z",
   "source": "github-api",
   "contributions": {
-    "total": 3859,
-    "commits": 2801,
+    "total": 3932,
+    "commits": 2855,
     "last365Days": [
-      {
-        "date": "2025-08-31",
-        "count": 0
-      },
       {
         "date": "2025-09-01",
         "count": 0
@@ -1460,19 +1456,23 @@
       },
       {
         "date": "2026-08-29",
-        "count": 73
+        "count": 85
       },
       {
         "date": "2026-08-30",
-        "count": 61
+        "count": 79
+      },
+      {
+        "date": "2026-08-31",
+        "count": 43
       }
     ]
   },
   "pullRequests": {
-    "authored": 981,
-    "open": 18,
-    "closed": 963,
-    "merged": 899,
+    "authored": 983,
+    "open": 17,
+    "closed": 966,
+    "merged": 902,
     "closedUnmerged": 64,
     "reviewed": 43
   },
@@ -1500,7 +1500,7 @@
       },
       {
         "name": "JavaScript",
-        "bytes": 773050
+        "bytes": 999951
       },
       {
         "name": "Python",
@@ -1515,12 +1515,12 @@
         "bytes": 196056
       },
       {
-        "name": "Standard ML",
-        "bytes": 176069
+        "name": "Shell",
+        "bytes": 177277
       },
       {
-        "name": "Shell",
-        "bytes": 175559
+        "name": "Standard ML",
+        "bytes": 176069
       },
       {
         "name": "Astro",
