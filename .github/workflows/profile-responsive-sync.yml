@@ -5,7 +5,7 @@ on:
     branches:
       - profile-responsive-layout-20260831
     paths:
-      - ".profile-sync/payload.b64"
+      - ".profile-sync/ready"
   workflow_dispatch:
 
 permissions:
@@ -31,7 +31,7 @@ jobs:
         id: payload
         shell: bash
         run: |
-          if [[ -f .profile-sync/payload.b64 ]]; then
+          if [[ -f .profile-sync/ready ]]; then
             echo "present=true" >> "${GITHUB_OUTPUT}"
           else
             echo "present=false" >> "${GITHUB_OUTPUT}"
@@ -50,10 +50,13 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          payload=".profile-sync/payload.b64"
+          manifest=".profile-sync/manifest.txt"
           archive="${RUNNER_TEMP}/profile-responsive-sync.tar.gz"
-          expected="$(head -n 1 "${payload}" | tr -d '[:space:]')"
-          tail -n +2 "${payload}" | base64 --decode > "${archive}"
+          test -s "${manifest}"
+          compgen -G '.profile-sync/payload.b64.*' > /dev/null
+          expected="$(head -n 1 "${manifest}" | tr -d '[:space:]')"
+          tail -n +2 "${manifest}" > .profile-sync/commit-message.txt
+          cat .profile-sync/payload.b64.* | base64 --decode > "${archive}"
           actual="$(sha256sum "${archive}" | cut -d' ' -f1)"
           if [[ ! "${expected}" =~ ^[0-9a-f]{64}$ || "${actual}" != "${expected}" ]]; then
             echo "::error::Implementation payload integrity check failed."
