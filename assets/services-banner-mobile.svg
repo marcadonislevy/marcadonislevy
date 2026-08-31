@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="680" height="360" viewBox="0 0 680 360" role="img" aria-labelledby="title description">
+  <title id="title">Website Design and Development Services</title>
+  <desc id="description">Available for website projects. Business websites, personal sites, secure intranets and web portals. View services.</desc>
+  <defs>
+    <linearGradient id="background" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#07152f"/>
+      <stop offset="0.6" stop-color="#0b2853"/>
+      <stop offset="1" stop-color="#124d78"/>
+    </linearGradient>
+    <linearGradient id="accent" x1="0" y1="0" x2="1" y2="0">
+      <stop stop-color="#58a6ff"/>
+      <stop offset="1" stop-color="#62d9ff"/>
+    </linearGradient>
+  </defs>
+  <rect x="1" y="1" width="678" height="358" rx="25" fill="url(#background)" stroke="#327eb7" stroke-width="2"/>
+  <circle cx="632" cy="40" r="120" fill="#36a9e8" opacity="0.08"/>
+  <path d="M520 38L608 88L650 38M535 270L608 88L662 238" fill="none" stroke="#62d9ff" stroke-width="1.5" opacity="0.15"/>
+  <rect x="38" y="38" width="292" height="35" rx="17.5" fill="#123f70" stroke="#48bde9"/>
+  <circle cx="61" cy="55.5" r="6" fill="#62d9ff"/>
+  <text x="80" y="61" fill="#bfefff" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="16" font-weight="700" letter-spacing="1.2">AVAILABLE FOR WEBSITE PROJECTS</text>
+  <text x="38" y="143" fill="#ffffff" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="48" font-weight="750" letter-spacing="-1.2">Website Design</text>
+  <text x="38" y="199" fill="#ffffff" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="48" font-weight="750" letter-spacing="-1.2">&amp; Development</text>
+  <text x="40" y="239" fill="#b9cce3" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="20">Business websites · personal sites</text>
+  <text x="40" y="268" fill="#b9cce3" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="20">Secure intranets · web portals</text>
+  <rect x="38" y="295" width="190" height="46" rx="12" fill="url(#accent)"/>
+  <text x="70" y="325" fill="#06162e" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="18" font-weight="800">VIEW SERVICES →</text>
+</svg>

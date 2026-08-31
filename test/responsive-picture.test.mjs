@@ -20,3 +20,15 @@ test("production README declares mobile, compact and desktop sources in priority
   }
   assert.match(markdown, /profile-desktop-light\.svg/);
 });
+
+test("production README leads with the responsive website-services banner", async () => {
+  const markdown = await readFile("README.template.md", "utf8");
+  const serviceLink = "https://marcadonislevy.github.io/website-design-services/";
+  const bannerPosition = markdown.indexOf("services-banner-desktop.svg");
+  const profilePosition = markdown.indexOf("profile-mobile-dark.svg");
+
+  assert.match(markdown, new RegExp(`href="${serviceLink}"`));
+  assert.match(markdown, /services-banner-mobile\.svg/);
+  assert.ok(bannerPosition >= 0, "missing desktop services banner");
+  assert.ok(bannerPosition < profilePosition, "services banner must appear before the profile artwork");
+});
