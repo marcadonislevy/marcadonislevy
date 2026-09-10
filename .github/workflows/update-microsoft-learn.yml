@@ -6,6 +6,7 @@ on:
       - main
     paths:
       - ".github/scripts/update-microsoft-learn.mjs"
+      - ".github/scripts/run-microsoft-learn.mjs"
       - ".github/workflows/update-microsoft-learn.yml"
   schedule:
     - cron: "7,37 * * * *"
@@ -41,12 +42,13 @@ jobs:
           MS_LEARN_PROFILE_URL: https://learn.microsoft.com/en-gb/users/marclevy/
         run: |
           set -euo pipefail
-          node .github/scripts/update-microsoft-learn.mjs
+          node .github/scripts/run-microsoft-learn.mjs
 
       - name: Verify generated assets
         run: |
           set -euo pipefail
           node --check .github/scripts/update-microsoft-learn.mjs
+          node --check .github/scripts/run-microsoft-learn.mjs
           git diff --check
           test -s assets/microsoft-learn-desktop.svg
           test -s assets/microsoft-learn-mobile.svg
