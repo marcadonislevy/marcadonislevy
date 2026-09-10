@@ -1,24 +1,12 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="1200" height="112" viewBox="0 0 1200 112" role="img" aria-labelledby="title description">
-  <title id="title">Microsoft Learn progress</title>
-  <desc id="description">Level 13, 414K XP, — badges and — trophies. View Microsoft Learn profile.</desc>
+  <title id="title">Microsoft Learn progress</title><desc id="description">Level 20, 4.9M XP, — badges and — trophies. View Microsoft Learn profile.</desc>
   <defs><linearGradient id="bg" x1="0" y1="0" x2="1" y2="0"><stop stop-color="#06182d"/><stop offset=".52" stop-color="#082e55"/><stop offset="1" stop-color="#05182b"/></linearGradient><linearGradient id="button" x1="0" y1="0" x2="1" y2="0"><stop stop-color="#0d4067"/><stop offset="1" stop-color="#083050"/></linearGradient></defs>
-  <rect x="1" y="1" width="1198" height="110" rx="20" fill="url(#bg)" stroke="#1676b6" stroke-width="2"/>
-  <rect x="1" y="1" width="1198" height="110" rx="20" fill="none" stroke="#4acfff" stroke-opacity=".12"/>
+  <rect x="1" y="1" width="1198" height="110" rx="20" fill="url(#bg)" stroke="#1676b6" stroke-width="2"/><rect x="1" y="1" width="1198" height="110" rx="20" fill="none" stroke="#4acfff" stroke-opacity=".12"/>
   <g transform="translate(32 31)"><rect width="18" height="18" fill="#f25022"/><rect x="21" width="18" height="18" fill="#7fba00"/><rect y="21" width="18" height="18" fill="#00a4ef"/><rect x="21" y="21" width="18" height="18" fill="#ffb900"/></g>
-  <text x="88" y="43" fill="#ffffff" font-family="Segoe UI,Arial,sans-serif" font-size="17" font-weight="800" letter-spacing="1.3">MICROSOFT LEARN</text>
-  <text x="88" y="64" fill="#82b9dc" font-family="Segoe UI,Arial,sans-serif" font-size="10" font-weight="700" letter-spacing="1.4">CONTINUOUSLY LEARNING</text>
-  <text x="88" y="79" fill="#82b9dc" font-family="Segoe UI,Arial,sans-serif" font-size="10" font-weight="700" letter-spacing="1.4">A BRIGHTER TOMORROW</text>
-  <g stroke="#285575" stroke-width="1"><path d="M278 25v62"/><path d="M428 25v62"/><path d="M586 25v62"/><path d="M744 25v62"/></g>
-  <g font-family="Segoe UI,Arial,sans-serif">
-    <g transform="translate(305 31)"><rect x="0" y="20" width="5" height="16" rx="2" fill="#28c7ff"/><rect x="9" y="12" width="5" height="24" rx="2" fill="#28c7ff"/><rect x="18" y="4" width="5" height="32" rx="2" fill="#28c7ff"/></g>
-    <text x="348" y="43" fill="#b7d8ee" font-size="10" font-weight="800" letter-spacing="1">LEVEL</text><text x="348" y="73" fill="#ffffff" font-size="29" font-weight="800">13</text>
-    <path d="M474 41l6 12 14 2-10 10 3 14-13-7-12 7 2-14-10-10 14-2z" fill="#28c7ff"/>
-    <text x="510" y="43" fill="#ffffff" font-size="27" font-weight="800">414K</text><text x="510" y="66" fill="#b7d8ee" font-size="10" font-weight="800" letter-spacing="1">XP</text>
-    <circle cx="628" cy="53" r="13" fill="none" stroke="#28c7ff" stroke-width="5"/><circle cx="628" cy="53" r="3" fill="#28c7ff"/><path d="M621 66l-4 14 11-6 11 6-4-14" fill="#28c7ff"/>
-    <text x="664" y="43" fill="#ffffff" font-size="27" font-weight="800">—</text><text x="664" y="66" fill="#b7d8ee" font-size="10" font-weight="800" letter-spacing="1">BADGES</text>
-    <path d="M787 39h29v12c0 12-7 20-14 20s-15-8-15-20z" fill="#28c7ff"/><path d="M787 45h-9c0 12 7 18 15 18M816 45h9c0 12-7 18-15 18" fill="none" stroke="#28c7ff" stroke-width="4"/><rect x="798" y="70" width="8" height="8" fill="#28c7ff"/><rect x="790" y="78" width="24" height="5" rx="2" fill="#28c7ff"/>
-    <text x="840" y="43" fill="#ffffff" font-size="27" font-weight="800">—</text><text x="840" y="66" fill="#b7d8ee" font-size="10" font-weight="800" letter-spacing="1">TROPHIES</text>
-  </g>
-  <rect x="973" y="29" width="195" height="54" rx="13" fill="url(#button)" stroke="#22c8ff" stroke-width="1.5"/>
-  <text x="1070" y="62" text-anchor="middle" fill="#42d8ff" font-family="Segoe UI,Arial,sans-serif" font-size="13" font-weight="800" letter-spacing=".5">VIEW LEARN PROFILE →</text>
-</svg>
+  <text x="88" y="43" fill="#ffffff" font-family="Segoe UI,Arial,sans-serif" font-size="17" font-weight="800" letter-spacing="1.3">MICROSOFT LEARN</text><text x="88" y="64" fill="#82b9dc" font-family="Segoe UI,Arial,sans-serif" font-size="10" font-weight="700" letter-spacing="1.4">CONTINUOUSLY LEARNING</text><text x="88" y="79" fill="#82b9dc" font-family="Segoe UI,Arial,sans-serif" font-size="10" font-weight="700" letter-spacing="1.4">A BRIGHTER TOMORROW</text>
+  <g stroke="#285575" stroke-width="1"><path d="M278 25v62"/><path d="M428 25v62"/><path d="M586 25v62"/><path d="M744 25v62"/></g><g font-family="Segoe UI,Arial,sans-serif">
+    <g transform="translate(305 31)"><rect x="0" y="20" width="5" height="16" rx="2" fill="#28c7ff"/><rect x="9" y="12" width="5" height="24" rx="2" fill="#28c7ff"/><rect x="18" y="4" width="5" height="32" rx="2" fill="#28c7ff"/></g><text x="348" y="43" fill="#b7d8ee" font-size="10" font-weight="800" letter-spacing="1">LEVEL</text><text x="348" y="73" fill="#ffffff" font-size="29" font-weight="800">20</text>
+    <path d="M474 41l6 12 14 2-10 10 3 14-13-7-12 7 2-14-10-10 14-2z" fill="#28c7ff"/><text x="510" y="43" fill="#ffffff" font-size="27" font-weight="800">4.9M</text><text x="510" y="66" fill="#b7d8ee" font-size="10" font-weight="800" letter-spacing="1">XP</text>
+    <circle cx="628" cy="53" r="13" fill="none" stroke="#28c7ff" stroke-width="5"/><circle cx="628" cy="53" r="3" fill="#28c7ff"/><path d="M621 66l-4 14 11-6 11 6-4-14" fill="#28c7ff"/><text x="664" y="43" fill="#ffffff" font-size="27" font-weight="800">—</text><text x="664" y="66" fill="#b7d8ee" font-size="10" font-weight="800" letter-spacing="1">BADGES</text>
+    <path d="M787 39h29v12c0 12-7 20-14 20s-15-8-15-20z" fill="#28c7ff"/><path d="M787 45h-9c0 12 7 18 15 18M816 45h9c0 12-7 18-15 18" fill="none" stroke="#28c7ff" stroke-width="4"/><rect x="798" y="70" width="8" height="8" fill="#28c7ff"/><rect x="790" y="78" width="24" height="5" rx="2" fill="#28c7ff"/><text x="840" y="43" fill="#ffffff" font-size="27" font-weight="800">—</text><text x="840" y="66" fill="#b7d8ee" font-size="10" font-weight="800" letter-spacing="1">TROPHIES</text>
+  </g><rect x="973" y="29" width="195" height="54" rx="13" fill="url(#button)" stroke="#22c8ff" stroke-width="1.5"/><text x="1070" y="62" text-anchor="middle" fill="#42d8ff" font-family="Segoe UI,Arial,sans-serif" font-size="13" font-weight="800" letter-spacing=".5">VIEW LEARN PROFILE →</text></svg>
