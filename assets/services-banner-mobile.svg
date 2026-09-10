@@ -1,26 +1,30 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="680" height="360" viewBox="0 0 680 360" role="img" aria-labelledby="title description">
-  <title id="title">Website Design and Development Services</title>
-  <desc id="description">Available for website projects. Business websites, personal sites, secure intranets and web portals. View services.</desc>
+<svg xmlns="http://www.w3.org/2000/svg" width="680" height="470" viewBox="0 0 680 470" role="img" aria-labelledby="title description">
+  <title id="title">Website Design and Development</title>
+  <desc id="description">Business websites, personal sites, secure intranets and web portals. View services.</desc>
   <defs>
-    <linearGradient id="background" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0" stop-color="#07152f"/>
-      <stop offset="0.6" stop-color="#0b2853"/>
-      <stop offset="1" stop-color="#124d78"/>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#06162f"/><stop offset=".58" stop-color="#073a72"/><stop offset="1" stop-color="#05203d"/>
     </linearGradient>
-    <linearGradient id="accent" x1="0" y1="0" x2="1" y2="0">
-      <stop stop-color="#58a6ff"/>
-      <stop offset="1" stop-color="#62d9ff"/>
-    </linearGradient>
+    <linearGradient id="cta" x1="0" y1="0" x2="1" y2="0"><stop stop-color="#16b9ff"/><stop offset="1" stop-color="#62d9ff"/></linearGradient>
+    <radialGradient id="glow" cx="75%" cy="12%" r="70%"><stop offset="0" stop-color="#118cff" stop-opacity=".5"/><stop offset="1" stop-color="#06162f" stop-opacity="0"/></radialGradient>
+    <clipPath id="clip"><rect x="1" y="1" width="678" height="468" rx="24"/></clipPath>
   </defs>
-  <rect x="1" y="1" width="678" height="358" rx="25" fill="url(#background)" stroke="#327eb7" stroke-width="2"/>
-  <circle cx="632" cy="40" r="120" fill="#36a9e8" opacity="0.08"/>
-  <path d="M520 38L608 88L650 38M535 270L608 88L662 238" fill="none" stroke="#62d9ff" stroke-width="1.5" opacity="0.15"/>
-  <rect x="38" y="34" width="420" height="44" rx="22" fill="#123f70" stroke="#48bde9"/>
-  <text x="248" y="62" text-anchor="middle" fill="#bfefff" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="18" font-weight="700" letter-spacing="0.7"><tspan fill="#62d9ff">●</tspan><tspan dx="11">AVAILABLE FOR WEBSITE PROJECTS</tspan></text>
-  <text x="38" y="143" fill="#ffffff" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="48" font-weight="750" letter-spacing="-1.2">Website Design</text>
-  <text x="38" y="199" fill="#ffffff" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="48" font-weight="750" letter-spacing="-1.2">&amp; Development</text>
-  <text x="40" y="239" fill="#b9cce3" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="20">Business websites · personal sites</text>
-  <text x="40" y="268" fill="#b9cce3" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="20">Secure intranets · web portals</text>
-  <rect x="38" y="291" width="230" height="52" rx="13" fill="url(#accent)"/>
-  <text x="153" y="324" text-anchor="middle" fill="#06162e" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="20" font-weight="800" letter-spacing="0.2">VIEW SERVICES →</text>
+  <rect x="1" y="1" width="678" height="468" rx="24" fill="url(#bg)" stroke="#1769a7" stroke-width="2"/>
+  <g clip-path="url(#clip)">
+    <rect width="680" height="470" fill="url(#glow)"/>
+    <g fill="#b8eaff" opacity=".5"><circle cx="420" cy="35" r="1.4"/><circle cx="475" cy="70" r="1"/><circle cx="520" cy="38" r="1.2"/><circle cx="585" cy="77" r="1.5"/><circle cx="635" cy="41" r="1"/></g>
+    <path d="M210 365 L278 332 L322 345 L380 287 L423 339 L466 309 L512 352 L560 320 L612 360 L680 335 L680 470 L190 470 Z" fill="#051628" opacity=".95"/>
+    <path d="M225 396 C350 374 494 398 680 376 L680 470 L225 470 Z" fill="#0a3557" opacity=".42"/>
+    <path d="M270 414 C395 400 527 415 652 402" fill="none" stroke="#4fdcff" stroke-width="2" opacity=".22"/>
+  </g>
+  <text x="38" y="52" fill="#b9d7f4" font-family="Segoe UI,Arial,sans-serif" font-size="13" font-weight="700" letter-spacing="3.7">BUILD / DESIGN / DEPLOY / GROW</text>
+  <text x="38" y="128" fill="#ffffff" font-family="Segoe UI,Arial,sans-serif" font-size="48" font-weight="800" letter-spacing="-1.2">Website Design <tspan fill="#78ddff">&amp;</tspan></text>
+  <text x="38" y="184" fill="#18b9ff" font-family="Segoe UI,Arial,sans-serif" font-size="48" font-weight="800" letter-spacing="-1.2">Development</text>
+  <text x="40" y="228" fill="#d1deec" font-family="Segoe UI,Arial,sans-serif" font-size="20">Business websites · personal sites</text>
+  <text x="40" y="258" fill="#d1deec" font-family="Segoe UI,Arial,sans-serif" font-size="20">Secure intranets · web portals</text>
+  <rect x="38" y="286" width="224" height="54" rx="13" fill="url(#cta)"/>
+  <text x="150" y="320" text-anchor="middle" fill="#031426" font-family="Segoe UI,Arial,sans-serif" font-size="18" font-weight="800" letter-spacing=".6">VIEW SERVICES →</text>
+  <text x="405" y="285" fill="#d9f6ff" font-family="Segoe Print,Segoe UI,Arial,sans-serif" font-size="22" font-style="italic" transform="rotate(-6 405 285)">Ideas into impact</text>
+  <path d="M407 298 Q492 283 573 298" fill="none" stroke="#37d7ff" stroke-width="4" stroke-linecap="round"/>
+  <text x="640" y="445" text-anchor="end" fill="#91b9d9" font-family="Segoe UI,Arial,sans-serif" font-size="10" font-weight="700" letter-spacing="1.8">CLEAN CODE. MEANINGFUL WEBSITES.</text>
 </svg>

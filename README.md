@@ -7,6 +7,14 @@
   </a>
   <br><br>
 
+  <a href="https://learn.microsoft.com/en-gb/users/marclevy/" aria-label="View Marc Levy's Microsoft Learn profile">
+    <picture>
+      <source media="(max-width: 600px)" srcset="./assets/microsoft-learn-mobile.svg">
+      <img src="./assets/microsoft-learn-desktop.svg" width="100%" alt="Microsoft Learn progress — level, XP, badges and trophies">
+    </picture>
+  </a>
+  <br><br>
+
   <picture>
     <source media="(prefers-color-scheme: dark) and (max-width: 767px)" srcset="./assets/profile-mobile-dark.svg">
     <source media="(prefers-color-scheme: light) and (max-width: 767px)" srcset="./assets/profile-mobile-light.svg">
