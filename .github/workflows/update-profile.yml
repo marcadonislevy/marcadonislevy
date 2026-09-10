@@ -12,7 +12,7 @@ on:
       - "scripts/**"
       - "test/**"
   schedule:
-    - cron: "17 * * * *"
+    - cron: "*/5 * * * *"
   workflow_dispatch:
 
 permissions:
