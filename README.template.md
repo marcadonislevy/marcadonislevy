@@ -1,8 +1,8 @@
 <div align="center">
   <a href="https://marcadonislevy.github.io/website-design-services/" aria-label="View Marc Levy's website design and development services">
     <picture>
-      <source media="(max-width: 600px)" srcset="./assets/services-banner-mobile.svg">
-      <img src="./assets/services-banner-desktop.svg" width="100%" alt="Available for website projects — Website Design and Development Services — View services">
+      <source media="(max-width: 600px)" srcset="./assets/services-banner-approved.png">
+      <img src="./assets/services-banner-approved.png" width="100%" alt="Available for website projects — Website Design and Development Services — View services">
     </picture>
   </a>
   <br><br>
