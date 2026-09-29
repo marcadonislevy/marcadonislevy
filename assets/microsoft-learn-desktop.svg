@@ -1,5 +1,5 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="1200" height="98" viewBox="0 0 1200 98" role="img" aria-labelledby="title description">
-  <title id="title">Microsoft Learn progress</title><desc id="description">Level 20, 4.9M XP, 3,128 badges and 718 trophies. View Microsoft Learn profile.</desc>
+  <title id="title">Microsoft Learn progress</title><desc id="description">Level 20, 4.9M XP, 3,140 badges and 722 trophies. View Microsoft Learn profile.</desc>
   <defs><linearGradient id="bg" x1="0" y1="0" x2="1" y2="0"><stop stop-color="#03172c"/><stop offset=".5" stop-color="#052b50"/><stop offset="1" stop-color="#03182c"/></linearGradient><linearGradient id="button" x1="0" y1="0" x2="1" y2="0"><stop stop-color="#052844"/><stop offset="1" stop-color="#031d33"/></linearGradient></defs>
   <rect x="1" y="1" width="1198" height="96" rx="16" fill="url(#bg)" stroke="#0a70aa" stroke-width="2"/><rect x="1" y="1" width="1198" height="96" rx="16" fill="none" stroke="#46d5ff" stroke-opacity=".11"/>
   <g transform="translate(35 27)"><rect width="18" height="18" fill="#f25022"/><rect x="21" width="18" height="18" fill="#7fba00"/><rect y="21" width="18" height="18" fill="#00a4ef"/><rect x="21" y="21" width="18" height="18" fill="#ffb900"/></g>
@@ -8,8 +8,8 @@
   <g font-family="Segoe UI,Arial,sans-serif" text-anchor="middle">
     <text x="380" y="48" fill="#ffffff" font-size="29" font-weight="800">20</text><text x="380" y="69" fill="#d1e7f5" font-size="12" font-weight="800" letter-spacing="1">LEVEL</text>
     <text x="544" y="48" fill="#ffffff" font-size="29" font-weight="800">4.9M</text><text x="544" y="69" fill="#d1e7f5" font-size="12" font-weight="800" letter-spacing="1">XP</text>
-    <text x="707" y="48" fill="#ffffff" font-size="29" font-weight="800">3,128</text><text x="707" y="69" fill="#d1e7f5" font-size="12" font-weight="800" letter-spacing="1">BADGES</text>
-    <text x="872" y="48" fill="#ffffff" font-size="29" font-weight="800">718</text><text x="872" y="69" fill="#d1e7f5" font-size="12" font-weight="800" letter-spacing="1">TROPHIES</text>
+    <text x="707" y="48" fill="#ffffff" font-size="29" font-weight="800">3,140</text><text x="707" y="69" fill="#d1e7f5" font-size="12" font-weight="800" letter-spacing="1">BADGES</text>
+    <text x="872" y="48" fill="#ffffff" font-size="29" font-weight="800">722</text><text x="872" y="69" fill="#d1e7f5" font-size="12" font-weight="800" letter-spacing="1">TROPHIES</text>
   </g>
   <rect x="975" y="23" width="200" height="51" rx="12" fill="url(#button)" stroke="#19cfff" stroke-width="1.5"/><text x="1075" y="54" text-anchor="middle" fill="#35dbff" font-family="Segoe UI,Arial,sans-serif" font-size="13" font-weight="800" letter-spacing=".5">VIEW LEARN PROFILE →</text>
 </svg>
