@@ -1,10 +1,10 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-11-20T17:50:38.951Z",
+  "generatedAt": "2026-11-20T23:24:30.922Z",
   "source": "github-api",
   "contributions": {
-    "total": 9302,
-    "commits": 6251,
+    "total": 9311,
+    "commits": 6252,
     "last365Days": [
       {
         "date": "2025-11-21",
@@ -1828,16 +1828,16 @@
       },
       {
         "date": "2026-11-20",
-        "count": 12,
+        "count": 21,
         "level": "FIRST_QUARTILE"
       }
     ]
   },
   "pullRequests": {
-    "authored": 2793,
-    "open": 588,
-    "closed": 2205,
-    "merged": 2038,
+    "authored": 2801,
+    "open": 595,
+    "closed": 2206,
+    "merged": 2039,
     "closedUnmerged": 167,
     "reviewed": 172
   },
@@ -1857,7 +1857,7 @@
     "top": [
       {
         "name": "TypeScript",
-        "bytes": 23326898
+        "bytes": 23345190
       },
       {
         "name": "PLpgSQL",
